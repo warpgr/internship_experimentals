@@ -1,13 +1,7 @@
-project (boost_experimentals)
-
-cmake_minimum_required ( VERSION 3.1.2 )
-
-find_package(Boost REQUIRED COMPONENTS filesystem)
-
 set (SOURCES 
-"${CMAKE_CURRENT_SOURCE_DIR}/pp_tree.cpp"
-"${CMAKE_CURRENT_SOURCE_DIR}/example_1.cpp"
-"${CMAKE_CURRENT_SOURCE_DIR}/example_2.cpp")
+    "${CMAKE_CURRENT_SOURCE_DIR}/pp_tree.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/example_1.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/example_2.cpp")
 
 add_executable (pp_tree_exec ${SOURCES} )
 set (CXX_STANDARD 11 )
