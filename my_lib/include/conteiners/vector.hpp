@@ -4,6 +4,13 @@
 namespace my {
 
 template <typename T>
+T&& forward(std::remove_reference_t<T>& value) {
+    return static_cast<T&&> (value);
+}
+
+
+
+template <typename T>
 class allocator {
 public:
     allocator() = default;
@@ -44,16 +51,16 @@ public:
         if (size_ == capacity_) {
             reserve();
         }
-        allocator_.construct(buffer_ + size_, args...);
+        allocator_.construct(buffer_ + size_, std::forward<Args>(args)...);
         size_++;
     }
 
     void push_back(const T& value) {
-        if (size_ == capacity_) {
-            reserve();
-        }
-        allocator_.construct(buffer_ + size_, value);
-        size_++;
+        emplace_back(value);
+    }
+
+    void push_back(T&& value) {
+        emplace_back(std::move(value));
     }
 
     void pop_back() {
