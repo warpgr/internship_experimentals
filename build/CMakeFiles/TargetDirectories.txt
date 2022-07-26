@@ -1,9 +1,0 @@
-/home/albert/Internsip/internship_experimentals/build/CMakeFiles/vector_exec.dir
-/home/albert/Internsip/internship_experimentals/build/CMakeFiles/edit_cache.dir
-/home/albert/Internsip/internship_experimentals/build/CMakeFiles/rebuild_cache.dir
-/home/albert/Internsip/internship_experimentals/build/boost_experimentals/CMakeFiles/pp_tree_exec.dir
-/home/albert/Internsip/internship_experimentals/build/boost_experimentals/CMakeFiles/edit_cache.dir
-/home/albert/Internsip/internship_experimentals/build/boost_experimentals/CMakeFiles/rebuild_cache.dir
-/home/albert/Internsip/internship_experimentals/build/my_lib/CMakeFiles/my_lib.dir
-/home/albert/Internsip/internship_experimentals/build/my_lib/CMakeFiles/edit_cache.dir
-/home/albert/Internsip/internship_experimentals/build/my_lib/CMakeFiles/rebuild_cache.dir
