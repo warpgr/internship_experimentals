@@ -1,9 +1,10 @@
 #include <iostream>
 #include <thread>
-#include <mutex.hpp>
 #include <atomic>
 
-using namespace lib;
+#include <concurrent/mutex.hpp>
+
+namespace il {
 
 template <typename T>
 class Forward_List {
@@ -162,6 +163,7 @@ public:
         }
     }
 };
+}
 
                   // -----Testing----- //
 // void foo(int a) {

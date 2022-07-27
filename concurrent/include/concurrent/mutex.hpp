@@ -4,7 +4,7 @@
 #ifndef _LIB__MUTEX_HPP
 #define _LIB__MUTEX_HPP
 
-namespace lib {
+namespace il {
 
 class mutex {
 private:
