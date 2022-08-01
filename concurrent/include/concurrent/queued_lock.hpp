@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 
+
 namespace il {
 
 class queed_lock {
@@ -23,7 +24,8 @@ class queed_lock {
     mutex&                                           m_;
 
     struct sstream_out {
-        // TODO: Implement sstream with blocking for logging queue of threads
+        // TODO: Implement sstream with blocking for logging queue of threads.
+
     };
 public:
     queed_lock(mutex& m)
@@ -50,13 +52,25 @@ public:
 
 
 class ticket_lock {
-
+    static std::atomic<int> ticket_;
+    static std::atomic<int> current_pos_;
+    mutex&                  m_;
 public:
-    // TODO: Ticket lock will atomicly give threads incrementable value,
-    // which will be their ticket number for capture lock.
-    // Ticket must get at enerance of critical section.
-
+    ticket_lock() = delete;
+    ticket_lock(mutex& m)
+        : m_(m) {
+            int ticket = ticket_.fetch_add(1);
+            while (ticket != current_pos_);
+            m_.lock();
+    }
+    ~ticket_lock() {
+        current_pos_.fetch_add(1);
+        m_.unlock();
+    }
+    ticket_lock(const ticket_lock& other) = delete;
+    ticket_lock& operator=(const ticket_lock& other) = delete;
 };
+
 
 
 }
