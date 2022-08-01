@@ -1,8 +1,7 @@
 #include <mutex>
 #include <atomic>
 
-#ifndef _LIB__MUTEX_HPP
-#define _LIB__MUTEX_HPP
+#pragma once
 
 namespace il {
 
@@ -10,8 +9,14 @@ class mutex {
 private:
     std::atomic<bool> captured {false};
 public:
+    mutex() { }
+    mutex (mutex&& other) = delete;
+    mutex&& operator=(mutex&& other) = delete;
+    mutex(const mutex& other) = delete;
+    mutex& operator=(const mutex& other) = delete;
     void lock();
     void unlock();
+    bool try_lock();
 };
 
 struct adopt_lock_t {};
@@ -29,5 +34,3 @@ public:
 };
 
 }
-
-#endif /* _LIB__MUTEX_HPP */
