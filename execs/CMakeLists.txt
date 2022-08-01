@@ -14,4 +14,11 @@ add_executable ( q_lock__exec queued_lock_exec.cpp )
 target_link_libraries (q_lock__exec ${CMAKE_THREAD_LIBS_INIT} containers )
 
 
+add_executable ( ticket_lock ticket_lock_exec.cpp )
+target_link_libraries (ticket_lock ${CMAKE_THREAD_LIBS_INIT} containers )
+set (CMAKE_CXX_STANDARD 17)
+add_executable ( lock_types lock_types.cpp )
+target_link_libraries (lock_types ${CMAKE_THREAD_LIBS_INIT} containers )
+
+
 
