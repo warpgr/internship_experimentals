@@ -3,7 +3,8 @@ find_package (Threads REQUIRED)
 
 set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/mutex.hpp
-             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/queued_lock.hpp )
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/queued_lock.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/unique_lock.hpp )
 
 
 
