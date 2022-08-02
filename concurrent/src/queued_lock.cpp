@@ -20,5 +20,9 @@ void queed_lock::blocked_threads_queue::pop_front() {
     threads_queue_.pop();
 }
 
+std::atomic<int> ticket_lock::ticket_ = { 0 };
+std::atomic<int> ticket_lock::current_pos_ = { 0 };
+
+
 
 }

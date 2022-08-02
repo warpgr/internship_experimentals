@@ -1,7 +1,8 @@
 
+set (CMAKE_CXX_STANDARD 17)
+
 add_executable (thread_exec thread_main.cpp)
-target_link_libraries (thread_exec ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries (thread_exec containers)
+target_link_libraries (thread_exec ${CMAKE_THREAD_LIBS_INIT} containers)
 
 add_executable ( vector_exec main.cpp )
 target_link_libraries ( vector_exec my_lib )
@@ -13,5 +14,16 @@ target_link_libraries (lock_guard_exec ${CMAKE_THREAD_LIBS_INIT} )
 add_executable ( q_lock__exec queued_lock_exec.cpp )
 target_link_libraries (q_lock__exec ${CMAKE_THREAD_LIBS_INIT} containers )
 
+
+add_executable ( ticket_lock ticket_lock_exec.cpp )
+target_link_libraries (ticket_lock ${CMAKE_THREAD_LIBS_INIT} containers )
+
+
+add_executable ( lock_types lock_types.cpp )
+target_link_libraries (lock_types ${CMAKE_THREAD_LIBS_INIT} containers )
+
+
+add_executable ( custom_unique_lock_exec custom_unique_lock.cpp )
+target_link_libraries (custom_unique_lock_exec ${CMAKE_THREAD_LIBS_INIT} containers )
 
 
