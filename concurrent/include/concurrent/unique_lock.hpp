@@ -41,6 +41,8 @@ public:
     bool try_lock();
     bool try_lock_for(const std::chrono::duration<int>& timeout_duration);
     bool try_lock_until(const std::chrono::time_point<std::chrono::system_clock>& time_point);
+    void swap(unique_lock &other)noexcept;
+    MutexType* release() noexcept;
 };
 
 template <typename MutexType>
@@ -83,7 +85,23 @@ bool unique_lock<MutexType>::try_lock_until(const std::chrono::time_point<std::c
     return false;
 }
 
+template <typename MutexType>
+void unique_lock<MutexType>::swap(unique_lock &other) noexcept {
+        std::swap(m_, other.m_);
+}
 
 
+template <typename MutexType>
+MutexType* unique_lock<MutexType>::release() noexcept {
+        MutexType* other = m_;
+        m_ = nullptr;
+        return other;
+}
+
+template<typename MutexType = mutex>
+    inline void swap(unique_lock<MutexType>& lhs, unique_lock<MutexType>& rhs) noexcept {
+        lhs.swap(rhs);
+}
 
 }
+
