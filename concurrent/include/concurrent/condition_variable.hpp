@@ -25,7 +25,11 @@ public:
 
 public:
 
-    void wait(LockType& lock);
+    void wait(LockType& lock) {
+        lock.unlock();
+        while (!flag_.exchange(false));
+        lock.lock();
+    }
     template <typename Func, typename... Args>
     void wait(LockType& lock, Func pred, Args... args) {
         while (!pred(std::forward(args)...)) {
@@ -47,23 +51,27 @@ public:
     }
 
     bool wait_until(LockType& lock, const std::chrono::time_point<std::chrono::system_clock>& time_point) {
+        lock.unlock();
         bool is_notified = false;
         while (std::chrono::system_clock::now() < time_point) {
             is_notified = flag_.exchange(false);
             if (is_notified) { break; }
         }
+        lock.lock();
         return is_notified;
     }
     template <typename Func, typename... Args>
     bool wait_until(LockType& lock, const std::chrono::time_point<std::chrono::system_clock>& time_point,
                     Func&& func, Args&&... args) {
         bool is_notified = false;
+        lock.unlock();
         while (std::chrono::system_clock::now() < time_point) {
             if (func(std::forward<Args>(args)...)) {
                 is_notified = flag_.exchange(false);
                 if (is_notified) { return true; }
             }
         }
+        lock.lock();
         return false;
     }
     void notify_one() {
@@ -79,12 +87,5 @@ private:
     }
 };
 
-
-template <typename LockType>
-void condition_variable<LockType>::wait(LockType& lock) {
-    while (!flag_.exchange(false)) {
-        lock_unlock(lock);
-    }
-}
 
 } // namespace il

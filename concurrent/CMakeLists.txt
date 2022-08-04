@@ -1,9 +1,12 @@
 
 set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/mpmc_queue.hpp
+
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/mutex.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/queued_lock.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/unique_lock.hpp
-             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/condition_variable.hpp )
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/condition_variable.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/thread_pool.hpp )
 
 
 
