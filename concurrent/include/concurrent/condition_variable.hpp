@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <chrono>
+
 // #include <concepts>
 
 namespace il {
@@ -25,7 +26,6 @@ public:
 public:
 
     void wait(LockType& lock);
-    // template<Predicate PredType>
     template <typename Func, typename... Args>
     void wait(LockType& lock, Func pred, Args... args) {
         while (!pred(std::forward(args)...)) {
@@ -40,10 +40,10 @@ public:
     }
     template <typename Func, typename... Args>
     bool wait_for(LockType& lock, const std::chrono::duration<int>& timeout_duration,
-                  Func func, Args... args) {
+                  Func&& func, Args&&... args) {
         auto now = std::chrono::system_clock::now();
         now += timeout_duration;
-        return wait_until(lock, now, func, std::forward(args)...);
+        return wait_until(lock, now, func, std::forward<Args>(args)...);
     }
 
     bool wait_until(LockType& lock, const std::chrono::time_point<std::chrono::system_clock>& time_point) {
@@ -56,18 +56,22 @@ public:
     }
     template <typename Func, typename... Args>
     bool wait_until(LockType& lock, const std::chrono::time_point<std::chrono::system_clock>& time_point,
-                    Func func, Args... args) {
+                    Func&& func, Args&&... args) {
         bool is_notified = false;
         while (std::chrono::system_clock::now() < time_point) {
-            if (func(std::forward(args)...)) {
+            if (func(std::forward<Args>(args)...)) {
                 is_notified = flag_.exchange(false);
                 if (is_notified) { return true; }
             }
         }
         return false;
     }
-    void notify_one();
-    void notify_all();
+    void notify_one() {
+        flag_.store(true);
+    }
+    void notify_all() {
+        flag_.store(true);
+    }
 private:
     inline void lock_unlock(LockType& lock) {
         lock.lock();
@@ -82,28 +86,5 @@ void condition_variable<LockType>::wait(LockType& lock) {
         lock_unlock(lock);
     }
 }
-
-
-// template <typename LockType, Predicate PredType>
-// void condition_variable<LockType, PredType>::wait(LockType& lock, PredType pred) {
-// }
-
-
-// template <typename LockType>
-// void condition_variable<LockType>::wait_for(LockType& lock, const std::chrono::duration<int>& timeout_duration) 
-
-// template <typename LockType>
-// void condition_variable<LockType>::wait_until(LockType& lock, const std::chrono::time_point<std::chrono::system_clock>& time_point) 
-
-template <typename LockType>
-void condition_variable<LockType>::notify_one() {
-    flag_.store(true);
-}
-
-template <typename LockType>
-void condition_variable<LockType>::notify_all() {
-    flag_.store(true);
-}
-
 
 } // namespace il

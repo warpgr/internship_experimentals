@@ -55,12 +55,12 @@ void producer_pred() {
         std::this_thread::sleep_for(std::chrono::seconds(5));
         il::unique_lock<il::mutex> lock(m);
         counter++;
+        ready = true;
         cv.notify_one();
     }
 }
 
-bool pred() {
-    std::cout << "pred called readi " << std::to_string(ready) << std::endl; 
+bool pred(int ) {
     return ready;
 }
 
@@ -68,9 +68,9 @@ void consumer_pred() {
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         il::unique_lock<il::mutex> lock(m);
-        if (cv.wait_for(lock, std::chrono::seconds(3)),
-            pred) {
+        if (cv.wait_for(lock, std::chrono::seconds(3), pred, 1)) {
             std::cout << "Geting notification counter is " << counter << std::endl;
+            ready = false;
         }
         else {
             std::cout << "Not Geting yet notification counter is " << counter << std::endl;
