@@ -6,14 +6,22 @@
 
 namespace il {
 
+template <typename T>
+concept UniqueLock = 
+    Lockable<T>                          && /* defined in mutex.hpp */
+    std::default_initializable<T>        &&
+    std::destructible<T>                 &&
+    std::move_constructible<T>           &&
+    std::is_move_assignable<T>::value    &&
+    !std::copy_constructible<T>          &&
+    !std::is_copy_assignable<T>::value;
 
-template <typename MutexType = mutex>
+template <Mutex mutex_type>
 class unique_lock {
-    MutexType* m_ = { nullptr };
+    mutex_type* m_ = { nullptr };
 public:
-
     unique_lock() = default;
-    unique_lock(MutexType& m) : m_(&m) {
+    unique_lock(mutex_type& m) : m_(&m) {
         assert(m_ != nullptr);
         lock();
     }
@@ -42,29 +50,29 @@ public:
     bool try_lock_for(const std::chrono::duration<int>& timeout_duration);
     bool try_lock_until(const std::chrono::time_point<std::chrono::system_clock>& time_point);
     void swap(unique_lock &other)noexcept;
-    MutexType* release() noexcept;
+    mutex_type* release() noexcept;
 };
 
-template <typename MutexType>
-void unique_lock<MutexType>::lock() {
+template <Mutex mutex_type>
+void unique_lock<mutex_type>::lock() {
     assert(nullptr != m_);
     m_->lock();
 }
 
-template <typename MutexType>
-void unique_lock<MutexType>::unlock() {
+template <Mutex mutex_type>
+void unique_lock<mutex_type>::unlock() {
     assert(nullptr != m_);
     m_->unlock();
 }
 
-template <typename MutexType>
-bool unique_lock<MutexType>::try_lock() {
+template <Mutex mutex_type>
+bool unique_lock<mutex_type>::try_lock() {
     assert(nullptr != m_);
     return m_->try_lock();
 }
 
-template <typename MutexType>
-bool unique_lock<MutexType>::try_lock_for(const std::chrono::duration<int>& timeout_duration) {
+template <Mutex mutex_type>
+bool unique_lock<mutex_type>::try_lock_for(const std::chrono::duration<int>& timeout_duration) {
     auto lock_until_time_point = std::chrono::system_clock::now();
     lock_until_time_point += timeout_duration;
     while (std::chrono::system_clock::now() < lock_until_time_point) {
@@ -75,8 +83,8 @@ bool unique_lock<MutexType>::try_lock_for(const std::chrono::duration<int>& time
     return false;
 }
 
-template <typename MutexType>
-bool unique_lock<MutexType>::try_lock_until(const std::chrono::time_point<std::chrono::system_clock>& time_point) {
+template <Mutex mutex_type>
+bool unique_lock<mutex_type>::try_lock_until(const std::chrono::time_point<std::chrono::system_clock>& time_point) {
     while (std::chrono::system_clock::now() < time_point) {
         if (try_lock()) {
             return true;
@@ -85,21 +93,21 @@ bool unique_lock<MutexType>::try_lock_until(const std::chrono::time_point<std::c
     return false;
 }
 
-template <typename MutexType>
-void unique_lock<MutexType>::swap(unique_lock &other) noexcept {
+template <Mutex mutex_type>
+void unique_lock<mutex_type>::swap(unique_lock &other) noexcept {
         std::swap(m_, other.m_);
 }
 
 
-template <typename MutexType>
-MutexType* unique_lock<MutexType>::release() noexcept {
-        MutexType* other = m_;
+template <Mutex mutex_type>
+mutex_type* unique_lock<mutex_type>::release() noexcept {
+        mutex_type* other = m_;
         m_ = nullptr;
         return other;
 }
 
-template<typename MutexType = mutex>
-    inline void swap(unique_lock<MutexType>& lhs, unique_lock<MutexType>& rhs) noexcept {
+template<Mutex mutex_type>
+    inline void swap(unique_lock<mutex_type>& lhs, unique_lock<mutex_type>& rhs) noexcept {
         lhs.swap(rhs);
 }
 

@@ -1,3 +1,5 @@
+set_property ( GLOBAL PROPERTY CMAKE_CXX_COMPILER "g++-10")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 
 set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/mutex.hpp
