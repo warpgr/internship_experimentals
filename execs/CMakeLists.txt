@@ -30,5 +30,6 @@ target_link_libraries (custom_unique_lock_exec ${CMAKE_THREAD_LIBS_INIT} contain
 add_executable ( condvar_exec condvar_exec.cpp )
 target_link_libraries (condvar_exec ${CMAKE_THREAD_LIBS_INIT} containers )
 
-
+add_executable ( thread_pool_exec thread_pool_exec.cpp )
+target_link_libraries (thread_pool_exec ${CMAKE_THREAD_LIBS_INIT} containers )
 
