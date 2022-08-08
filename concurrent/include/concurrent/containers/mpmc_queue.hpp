@@ -3,6 +3,10 @@
 #include <concurrent/mutex.hpp>
 #include <concurrent/unique_lock.hpp>
 #include <concurrent/condition_variable.hpp>
+#include <condition_variable>
+#include <sstream>
+
+#include <iostream>
 
 namespace il {
 
@@ -21,44 +25,51 @@ class mpmc_queue {
         T pop();
     private:
         std::queue<T>                  elements_;
-        mutable mutex                  elements_guard_;
-        il::condition_variable<unique_lock<mutex>>
+        mutable std::mutex             elements_guard_;
+        std::condition_variable
                                        is_not_empty_;
+    private:
+        T take();
 };
 
-template <typename T> 
+
+template <typename T>
 bool mpmc_queue<T>::empty() const {
-    unique_lock<mutex> lock(elements_guard_);
+    std::unique_lock<std::mutex> lock(elements_guard_);
     return elements_.empty();
 }
 
 template <typename T>
 void mpmc_queue<T>::push(const T&& data) {
-    unique_lock<mutex> lock(elements_guard_);
+    std::unique_lock<std::mutex> lock(elements_guard_);
     elements_.push(std::move(data));
-    is_not_empty_.notify_all();
+    is_not_empty_.notify_one();
 }
 
 template <typename T>
 boost::optional<T> mpmc_queue<T>::try_pop() {
-    unique_lock<mutex> lock(elements_guard_);
+    std::unique_lock<std::mutex> lock(elements_guard_);
     if (elements_.empty()) {
         return boost::optional<T>();
     }
-    T data(std::move(elements_.front()));
-    elements_.pop();
-    return data;
+    return take();
 }
 
 template <typename T>
 T mpmc_queue<T>::pop() {
-    unique_lock<mutex> lock(elements_guard_);
-    while (empty()) {
+    std::unique_lock<std::mutex> lock(elements_guard_);
+    while (elements_.empty()) {
         is_not_empty_.wait(lock);
     }
-    T element(std::move(elements_.front()));
+    return take();
+}
+
+template <typename T>
+T mpmc_queue<T>::take() {
+    assert (!elements_.empty());
+    T item =  std::move(elements_.front());
     elements_.pop();
-    return element;
+    return item;
 }
 
 } // namespace il
