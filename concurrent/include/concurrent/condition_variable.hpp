@@ -37,20 +37,21 @@ public:
         }
     }
 
-    bool wait_for(LockType& lock, const std::chrono::duration<int>& timeout_duration) {
+    template <typename Rep, typename Period = std::ratio<1>> 
+    bool wait_for(LockType& lock, const std::chrono::duration<Rep, Period>& timeout_duration) {
         auto now = std::chrono::system_clock::now();
         now += timeout_duration;
         return wait_until(lock, now);
     }
-    template <typename Func, typename... Args>
-    bool wait_for(LockType& lock, const std::chrono::duration<int>& timeout_duration,
+    template <typename Rep, typename Period = std::ratio<1>, typename Func, typename... Args>
+    bool wait_for(LockType& lock, const std::chrono::duration<Rep, Period>& timeout_duration,
                   Func&& func, Args&&... args) {
         auto now = std::chrono::system_clock::now();
         now += timeout_duration;
         return wait_until(lock, now, func, std::forward<Args>(args)...);
     }
-
-    bool wait_until(LockType& lock, const std::chrono::time_point<std::chrono::system_clock>& time_point) {
+    template <typename Clock, typename Duration = typename Clock::duration>
+    bool wait_until(LockType& lock, const std::chrono::time_point<Clock, Duration>& time_point) {
         lock.unlock();
         bool is_notified = false;
         while (std::chrono::system_clock::now() < time_point) {
@@ -60,8 +61,9 @@ public:
         lock.lock();
         return is_notified;
     }
-    template <typename Func, typename... Args>
-    bool wait_until(LockType& lock, const std::chrono::time_point<std::chrono::system_clock>& time_point,
+    template <typename Clock, typename Duration = typename Clock::duration,
+              typename Func, typename... Args>
+    bool wait_until(LockType& lock, const std::chrono::time_point<Clock, Duration>& time_point,
                     Func&& func, Args&&... args) {
         bool is_notified = false;
         lock.unlock();
