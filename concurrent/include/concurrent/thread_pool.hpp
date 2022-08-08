@@ -4,7 +4,6 @@
 #include <vector>
 #include <thread>
 #include <atomic>
-#include <iostream>
 
 namespace il {
 
@@ -23,7 +22,7 @@ public:
         }
     }
     ~thread_pool() {
-        while (!tasks_.empty());//
+        while (!tasks_.empty());// TODO:
         join();
     }
     void put_task(TaskType&& task) {
@@ -45,7 +44,6 @@ private:
     }
     void join() {
         for (int i = 0; i < workers_.size(); ++i) {
-            std::cout << "empty tasks pushing\n";
             tasks_.push({});
         }
         for (auto& worker : workers_) {

@@ -3,10 +3,6 @@
 #include <concurrent/mutex.hpp>
 #include <concurrent/unique_lock.hpp>
 #include <concurrent/condition_variable.hpp>
-#include <condition_variable>
-#include <sstream>
-
-#include <iostream>
 
 namespace il {
 
@@ -25,8 +21,8 @@ class mpmc_queue {
         T pop();
     private:
         std::queue<T>                  elements_;
-        mutable std::mutex             elements_guard_;
-        std::condition_variable
+        mutable il::mutex             elements_guard_;
+        il::condition_variable<il::unique_lock<il::mutex>>
                                        is_not_empty_;
     private:
         T take();
@@ -35,20 +31,20 @@ class mpmc_queue {
 
 template <typename T>
 bool mpmc_queue<T>::empty() const {
-    std::unique_lock<std::mutex> lock(elements_guard_);
+    il::unique_lock<il::mutex> lock(elements_guard_);
     return elements_.empty();
 }
 
 template <typename T>
 void mpmc_queue<T>::push(const T&& data) {
-    std::unique_lock<std::mutex> lock(elements_guard_);
+    il::unique_lock<il::mutex> lock(elements_guard_);
     elements_.push(std::move(data));
     is_not_empty_.notify_one();
 }
 
 template <typename T>
 boost::optional<T> mpmc_queue<T>::try_pop() {
-    std::unique_lock<std::mutex> lock(elements_guard_);
+    il::unique_lock<il::mutex> lock(elements_guard_);
     if (elements_.empty()) {
         return boost::optional<T>();
     }
@@ -57,7 +53,7 @@ boost::optional<T> mpmc_queue<T>::try_pop() {
 
 template <typename T>
 T mpmc_queue<T>::pop() {
-    std::unique_lock<std::mutex> lock(elements_guard_);
+    il::unique_lock<il::mutex> lock(elements_guard_);
     while (elements_.empty()) {
         is_not_empty_.wait(lock);
     }
