@@ -5,30 +5,40 @@
 namespace il { namespace impl {
 
 template<typename T>
-class shared_state_recv : protected il::impl::shared_state<T> {
+class shared_state_recv {
+    std::shared_ptr<shared_state<T>> state_ = { nullptr };
+public:
+    shared_state_recv() { state_ = std::make_shared<shared_state<T>>(); }
+    shared_state_recv(const std::shared_ptr<shared_state<T>>& state) { state_ = state; }
+    shared_state_recv(std::shared_ptr<shared_state<T>>&& state) { state_ = std::move(state); }
+
+    shared_state_recv(const shared_state_recv& other) = delete;
+    shared_state_recv(shared_state_recv&& other) = delete;
+    shared_state_recv& operator=(const shared_state_recv& other) = delete;
+    shared_state_recv&& operator=(shared_state_recv&& other) = delete;
 public:
     T get() {
-        wait();
-        if (nullptr != ex_ptr_) {
-            throw *ex_ptr_;
-        }
-        return shared_data_;
+        have_correct_state(state_);
+        return state_->get();
     }
     void wait() {
-        il::unique_lock<il::mutex> lock(guard_);
-        is_ready_.wait(lock);
+        have_correct_state(state_);
+        return state_->wait();
     }
     template <typename Rep, typename Period = std::ratio<1>>
     void wait_for(const std::chrono::duration<Rep, Period>& duration) {
-        il::unique_lock<il::mutex> lock(guard_);
-        is_ready_.wait_for(lock, duration);
+        have_correct_state(state_);
+        return state_->wait_for(duration);
     }
     template <typename Clock, typename Duration = typename Clock::duration>
     void wait_until(const std::chrono::time_point<Clock, Duration>& timeout_time) {
-        il::unique_lock<il::mutex> lock(guard_);
-        is_ready_.wait_until(lock, timeout_time);
+        have_correct_state(state_);
+        return state_->wait_until(timeout_time);
     }
-    ~shared_state_recv() = default;
+
+    std::shared_ptr<shared_state<T>> state() {
+        return state_;
+    }
 };
 
 }}
