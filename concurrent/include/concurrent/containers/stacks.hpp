@@ -6,7 +6,7 @@
 
 namespace il {
 template <typename T>
-concept MC = std::is_move_assignable_v || std::is_copy_assignable_v;
+concept MC = std::is_move_assignable<T> || std::is_copy_assignable<T> || std::is_move_constructible<T> || std::is_copy_constructible<T>;
 
     template <MC T>
         class allocator {
@@ -35,12 +35,11 @@ concept MC = std::is_move_assignable_v || std::is_copy_assignable_v;
         private:
             T* buf;
             int _top;
-            size_t capacity;
+            size_t capacity = 10;
             Alloc allocator;
         public:
             stack() {
-                buf = allocator.allocate(10);
-                capacity = 0;
+                buf = allocator.allocate(capacity);
                 _top = -1;
             }
             stack(size_t size) {
@@ -54,7 +53,7 @@ concept MC = std::is_move_assignable_v || std::is_copy_assignable_v;
             stack(const stack<T>& other) {
                 capacity = other.capacity;
                 _top = other._top;
-                buf = allocator.allocate(other.capacity);
+                buf = allocator.allocate(capacity);
                 for(int i = 0; i < capacity; ++i) {
                     buf[i] = other.buf[i];
                 }
