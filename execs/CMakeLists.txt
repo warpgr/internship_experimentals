@@ -33,3 +33,14 @@ target_link_libraries (condvar_exec ${CMAKE_THREAD_LIBS_INIT} containers )
 add_executable ( thread_pool_exec thread_pool_exec.cpp )
 target_link_libraries (thread_pool_exec ${CMAKE_THREAD_LIBS_INIT} containers )
 
+
+add_executable ( future_std_example future_std_example.cpp )
+target_link_libraries ( future_std_example ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable ( custom_future_exec future_custom_exec.cpp )
+target_link_libraries ( custom_future_exec ${CMAKE_THREAD_LIBS_INIT} containers)
+
+
+
+add_executable ( custom_async_exec custom_async_exec.cpp )
+target_link_libraries ( custom_async_exec ${CMAKE_THREAD_LIBS_INIT} containers)

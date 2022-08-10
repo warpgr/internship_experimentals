@@ -51,4 +51,10 @@ private:
         }
     }
 };
+
+template<typename TaskType>
+thread_pool<TaskType>& default_tp() {
+    static thread_pool<TaskType> tp;
+    return tp;
+}
 } // namespace il
