@@ -1,0 +1,254 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.2"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "boost_experimentals",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.2"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "boost_experimentals",
+					"targetIndexes" : 
+					[
+						0,
+						10
+					]
+				},
+				{
+					"build" : "concurrent",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.2"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "concurrent",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "my_lib",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.2"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "my_lib",
+					"targetIndexes" : 
+					[
+						9
+					]
+				},
+				{
+					"build" : "execs",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.2"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "execs",
+					"targetIndexes" : 
+					[
+						1,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						11,
+						12,
+						13,
+						14,
+						15
+					]
+				}
+			],
+			"name" : "",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					],
+					"name" : "internship_cource",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "b_thread_ex::@6b21d830fbf4c6c01183",
+					"jsonFile" : "target-b_thread_ex-d2fc27e56b66f85bd9de.json",
+					"name" : "b_thread_ex",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "condvar_exec::@f744199237f1ba9082f3",
+					"jsonFile" : "target-condvar_exec-37b63f6cecc9f8a73526.json",
+					"name" : "condvar_exec",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "containers::@2beca3e4e3d386bd9238",
+					"jsonFile" : "target-containers-6959fe2fe792cb2cd040.json",
+					"name" : "containers",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "custom_async_exec::@f744199237f1ba9082f3",
+					"jsonFile" : "target-custom_async_exec-185282a91df9fb1e7242.json",
+					"name" : "custom_async_exec",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "custom_future_exec::@f744199237f1ba9082f3",
+					"jsonFile" : "target-custom_future_exec-67cf6f00ae69c0e19955.json",
+					"name" : "custom_future_exec",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "custom_unique_lock_exec::@f744199237f1ba9082f3",
+					"jsonFile" : "target-custom_unique_lock_exec-8dba609ce313933f4b41.json",
+					"name" : "custom_unique_lock_exec",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "future_std_example::@f744199237f1ba9082f3",
+					"jsonFile" : "target-future_std_example-d74c43e77b3a60bf772a.json",
+					"name" : "future_std_example",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "lock_guard_exec::@f744199237f1ba9082f3",
+					"jsonFile" : "target-lock_guard_exec-0aaa8c13ccac0065a78c.json",
+					"name" : "lock_guard_exec",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "lock_types::@f744199237f1ba9082f3",
+					"jsonFile" : "target-lock_types-765ec0ba524cd0dcd3d4.json",
+					"name" : "lock_types",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "my_lib::@ab1e3d45447ab9a7bb2e",
+					"jsonFile" : "target-my_lib-0ace735c77ae520d2704.json",
+					"name" : "my_lib",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pp_tree_exec::@6b21d830fbf4c6c01183",
+					"jsonFile" : "target-pp_tree_exec-8bfaf9204524812cee6d.json",
+					"name" : "pp_tree_exec",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "q_lock__exec::@f744199237f1ba9082f3",
+					"jsonFile" : "target-q_lock__exec-7a454f860627fc13608b.json",
+					"name" : "q_lock__exec",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "thread_exec::@f744199237f1ba9082f3",
+					"jsonFile" : "target-thread_exec-603deb208febaa04ebe7.json",
+					"name" : "thread_exec",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "thread_pool_exec::@f744199237f1ba9082f3",
+					"jsonFile" : "target-thread_pool_exec-0830a635fec978711899.json",
+					"name" : "thread_pool_exec",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "ticket_lock::@f744199237f1ba9082f3",
+					"jsonFile" : "target-ticket_lock-5bfab094d7a530177b42.json",
+					"name" : "ticket_lock",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "vector_exec::@f744199237f1ba9082f3",
+					"jsonFile" : "target-vector_exec-c064c0e44c85f683526c.json",
+					"name" : "vector_exec",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/gexam/internship_experimentals/build",
+		"source" : "/home/gexam/internship_experimentals"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 1
+	}
+}

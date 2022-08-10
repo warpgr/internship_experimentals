@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/gexam/internship_experimentals/boost_experimentals/thread.cpp
+boost/thread/thread.hpp
+-
+boost/chrono.hpp
+-
+boost/chrono/time_point.hpp
+-
+chrono
+-
+iostream
+-
+

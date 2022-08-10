@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../concurrent/include/concurrent/containers/list.hpp
+iostream
+-
+thread
+-
+atomic
+-
+concurrent/mutex.hpp
+-
+
+../concurrent/include/concurrent/mutex.hpp
+mutex
+-
+atomic
+-
+
+/home/gexam/internship_experimentals/execs/thread_main.cpp
+concurrent/mutex.hpp
+-
+concurrent/containers/list.hpp
+-
+

@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../concurrent/include/concurrent/mutex.hpp
+mutex
+-
+atomic
+-
+
+../concurrent/include/concurrent/queued_lock.hpp
+queue
+-
+thread
+-
+mutex
+-
+concurrent/mutex.hpp
+-
+iostream
+-
+sstream
+-
+
+/home/gexam/internship_experimentals/execs/queued_lock_exec.cpp
+concurrent/queued_lock.hpp
+-
+vector
+-
+iostream
+-
+

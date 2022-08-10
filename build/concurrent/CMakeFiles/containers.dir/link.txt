@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcontainers.a CMakeFiles/containers.dir/src/mutex.cpp.o CMakeFiles/containers.dir/src/containers/list.cpp.o CMakeFiles/containers.dir/src/queued_lock.cpp.o CMakeFiles/containers.dir/src/condition_variable.cpp.o
+/usr/bin/ranlib libcontainers.a
