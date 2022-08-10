@@ -2,6 +2,7 @@
 #include <shared_state_impl/shared_state_recv.hpp>
 #include <shared_state_impl/shared_state_send.hpp>
 #include <memory>
+#include <iostream>
 
 namespace il {
 
@@ -32,18 +33,18 @@ public:
     }
 public:
     void wait() {
-        state_.wait();
+        state_->wait();
     }
     template <typename Rep, typename Period = std::ratio<1>>
     void wait_for(const std::chrono::duration<Rep, Period>& duration) {
-        state_.wait(duration);
+        state_->wait_for(duration);
     }
     template <typename Clock, typename Duration = typename Clock::duration>
     void wait_until(const std::chrono::time_point<Clock, Duration>& timeout_time) {
-        state_.wait_until(timeout_time);
+        state_->wait_until(timeout_time);
     }
     T get() {
-        return state_.get();
+        return state_->get();
     }
     bool valid() const  {
         return (nullptr != state_);

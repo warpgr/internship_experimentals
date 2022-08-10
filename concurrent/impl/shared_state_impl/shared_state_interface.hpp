@@ -5,18 +5,39 @@
 #include <exception>
 #include <chrono>
 #include <memory>
+#include <atomic>
+#include <iostream>
 
 namespace il { namespace impl {
 
-#define have_correct_state(state) assert(nullptr != state)
+#define have_correct_state(state) assert(nullptr != state);
+#define is_state_shared(shared) assert(shared.load());
+#define is_state_shared_and_is_not_setted(shared, setted ) \
+    is_state_shared(shared)\
+    assert(!setted.load());
+
 
 template <typename T>
 class shared_state {
+    unique_lock<mutex> wait_() {
+        unique_lock<mutex> lock(guard_);
+        is_ready_.wait(lock, [&] { return is_setted_.load(); });
+        return lock;
+    }
+    unique_lock<mutex> wait_for_set() {
+        unique_lock<mutex> lock(guard_);
+        if (!is_first_.exchange(false)) {
+            is_ready_.wait(lock, [&] { return !is_setted_.load(); });
+        }
+        return lock;
+    }
 protected:
     condition_variable<unique_lock<mutex>>              is_ready_;
     mutex                                               guard_;
     T                                                   shared_data_; // TODO: must be with allocator // shared_ptr
     std::shared_ptr<std::exception>                     ex_ptr_ = nullptr;
+    std::atomic<bool>                                   is_first_ = { true };
+    std::atomic<bool>                                   is_setted_ = { false };
 public:
     shared_state() { };
     shared_state(shared_state&& other) = delete;
@@ -26,15 +47,17 @@ public:
 
 public: // Receiver interface
     T get() {
-        wait();
+        auto lock = wait_();
         if (nullptr != ex_ptr_) {
             throw ex_ptr_;
         }
-        return shared_data_;
+        T tmp(std::move(shared_data_));
+        is_setted_.store(false);
+        is_ready_.notify_one();
+        return tmp;
     }
     void wait() {
-        unique_lock<mutex> lock(guard_);
-        is_ready_.wait(lock);
+       wait_();
     }
     template <typename Rep, typename Period = std::ratio<1>>
     void wait_for(const std::chrono::duration<Rep, Period>& duration) {
@@ -48,30 +71,36 @@ public: // Receiver interface
     }
 public: // Sender interface
     void set_value(T& value) {
-        unique_lock<mutex> lock(guard_);
+        auto lock = wait_for_set();
         shared_data_ = value;
+        is_setted_.store(true);
         is_ready_.notify_one();
     }
     void set_value(T&& value) {
-        unique_lock<mutex> lock(guard_);
-        shared_data_(std::move(value));
+        auto lock = wait_for_set();
+        shared_data_ = std::move(value);
+        is_setted_.store(true);
         is_ready_.notify_one();
     }
     void set_value(const T& value) {
-        unique_lock<mutex> lock(guard_);
+        auto lock = wait_for_set();
         shared_data_(value);
+        is_setted_.store(true);
         is_ready_.notify_one();
     }
     void set_value() {
-        unique_lock<mutex> lock(guard_);
+        auto lock = wait_for_set();
         shared_data_ = T();
+        is_setted_.store(true);
         is_ready_.notify_one();
     }
     void set_exception(const std::exception& ex) {
        set_exception(std::exception(ex));
     }
     void set_exception(std::exception&& ex) {
+        auto lock = wait_();
         ex_ptr_ = std::make_shared<std::exception>(std::move(ex));
+        is_setted_.store(true);
         is_ready_.notify_one();
     }
 };

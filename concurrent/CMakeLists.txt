@@ -9,6 +9,7 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/thread_pool.hpp 
              
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/future.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/async.hpp
              
              
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_interface.hpp 
