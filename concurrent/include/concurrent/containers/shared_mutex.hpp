@@ -6,40 +6,38 @@
 #include <shared_mutex>
 
 namespace il {
-    class shared_mutex {
+    template <typename MutexType = shared_mutex>
+    class shared_lock {
     private:
-        std::atomic<bool> captured_exclusive{false};
-        std::atomic<bool> captured_shared{false};
+        MutexType* m_ = nullptr;
     public:
-        shared_mutex (shared_mutex&& other) = delete;
-        shared_mutex&& operator=(shared_mutex&& other) = delete;
-        shared_mutex(const shared_mutex& other) = delete;
-        shared_mutex& operator=(const shared_mutex& other) = delete;
-        shared_mutex() = default;
-    public: // Exclusive Locking
-        void lock() {
-            while(captured_shared != false);
-            while(captured_exclusive.exchange(true));
+        shared_lock(MutexType& m) {
+           m_ = m;
+           assert(m_ != nullptr);
+           m_->lock_shared(); 
         }
-        bool try_lock() {
-            return !(captured_exclusive.exchange(true));
+        ~shared_lock() {
+            m_->unlock_shared();
+        }
+        shared_lock&& operator=(shared_lock&& other) {
+            m_(other.m_);
+            other.m_ = nullptr;
+            return std::move(*this);
+        }
+        shared_lock(const shared_lock& other) = delete;
+        shared_lock& operator=(const shared_lock& other) = delete;
+        shared_lock(shared_lock&& other) = delete;
+    public:
+        void lock() {
+            assert(nullptr != m_);
+            m_->lock();
         }
         void unlock() {
-            captured_exclusive = false;
-        }
-    public: // Shared Locking
-        void lock_shared() {
-            while(captured_exclusive != false) {}
-            captured_shared = true;
-        }
-        // bool try_lock_shared() { //...
-        // }
-        void unlock_shared() {
-            captured_shared = false;
+            assert(nullptr != m_);
+            m_->unlock();
         }
     };
 }
-
 
                               // -- Testing -- //
 // class ThreadSafeCounter {
