@@ -6,35 +6,41 @@
 #include <shared_mutex>
 
 namespace il {
-    template <typename MutexType = shared_mutex>
-    class shared_lock {
+    class shared_mutex {
     private:
-        MutexType* m_ = nullptr;
+        std::atomic<int> count_{0};
     public:
-        shared_lock(MutexType& m) {
-           m_ = m;
-           assert(m_ != nullptr);
-           m_->lock_shared(); 
-        }
-        ~shared_lock() {
-            m_->unlock_shared();
-        }
-        shared_lock&& operator=(shared_lock&& other) {
-            m_(other.m_);
-            other.m_ = nullptr;
-            return std::move(*this);
-        }
-        shared_lock(const shared_lock& other) = delete;
-        shared_lock& operator=(const shared_lock& other) = delete;
-        shared_lock(shared_lock&& other) = delete;
-    public:
+        shared_mutex (shared_mutex&& other) = delete;
+        shared_mutex&& operator=(shared_mutex&& other) = delete;
+        shared_mutex(const shared_mutex& other) = delete;
+        shared_mutex& operator=(const shared_mutex& other) = delete;
+        shared_mutex() = default;
+    public: // Exclusive Locking
         void lock() {
-            assert(nullptr != m_);
-            m_->lock();
+          int count_to_compare = 0;
+            while(!count_.compare_exchange_weak(count_to_compare, -1)) {
+                count_to_compare = 0;
+            }
         }
+        // bool try_lock() {
+           
+        // }
         void unlock() {
-            assert(nullptr != m_);
-            m_->unlock();
+            count_.store(0);
+        }
+    public: // Shared Locking
+        void lock_shared() {
+            int count_of_shared_threads = count_.load();
+            while(!count_.compare_exchange_weak(count_of_shared_threads, count_of_shared_threads + 1)) { // Exchange weak lets us to return false when it is expected is equal to count
+              do {
+                count_of_shared_threads = count_.load();
+              } while (count_of_shared_threads == -1);
+            }
+        }
+        // bool try_lock_shared() { //...
+        // }
+        void unlock_shared() {
+            count_.store(count_ - 1);
         }
     };
 }
