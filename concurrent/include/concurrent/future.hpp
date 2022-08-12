@@ -49,6 +49,11 @@ public:
     bool valid() const  {
         return (nullptr != state_);
     }
+    template <typename Func>
+    auto then(Func&& func, const launch& launch_type = launch::asynchronious) ->
+        future<decltype(func(T()))> {
+        return state_->then(std::forward<Func>(func), launch_type);
+    }
 };
 
 template <typename T>
