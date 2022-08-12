@@ -1,21 +1,18 @@
-// #include <condition_variable>
-
-#include <concurrent/condition_variable.hpp>
-#include <concurrent/mutex.hpp>
-#include <concurrent/unique_lock.hpp>
 #include <string>
 #include <thread>
 #include <iostream>
 
-
+#include <concurrent/condition_variable.hpp>
+#include <concurrent/mutex.hpp>
+#include <concurrent/unique_lock.hpp>
 
 using namespace std::chrono_literals;
 
 
-il::condition_variable<il::unique_lock<il::mutex>> cv;
-il::mutex                                          m;
-int                                                counter;
-bool                                               ready = false;
+il::condition_variable cv;
+il::mutex              m;
+int                    counter;
+bool                   ready = false;
 
 
 void producer() {
@@ -60,15 +57,11 @@ void producer_pred() {
     }
 }
 
-bool pred(int ) {
-    return ready;
-}
-
 void consumer_pred() {
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         il::unique_lock<il::mutex> lock(m);
-        if (cv.wait_for(lock, std::chrono::seconds(3), pred, 1)) {
+        if (cv.wait_for(lock, std::chrono::seconds(3), []{return ready;})) {
             std::cout << "Geting notification counter is " << counter << std::endl;
             ready = false;
         }

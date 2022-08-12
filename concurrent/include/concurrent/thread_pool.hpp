@@ -1,15 +1,17 @@
 #pragma once
 
-#include <concurrent/containers/mpmc_queue.hpp>
 #include <vector>
 #include <thread>
 #include <atomic>
+#include <concepts>
+
+#include <concurrent/containers/mpmc_queue.hpp>
 
 namespace il {
 
-template <typename TaskType>
+template <std::invocable task_type>
 class thread_pool {
-    mpmc_queue<TaskType>     tasks_;
+    mpmc_queue<task_type>     tasks_;
     std::vector<std::thread> workers_;
 public:
     thread_pool(size_t thread_count = 4) {
@@ -25,7 +27,7 @@ public:
         while (!tasks_.empty());// TODO:
         join();
     }
-    void put_task(TaskType&& task) {
+    void put_task(task_type&& task) {
         tasks_.push(std::move(task));
     }
     thread_pool(const thread_pool&) = delete;
@@ -35,7 +37,7 @@ public:
 private:
     void worker_routine() {
         while (true) {
-            TaskType task = tasks_.pop();
+            task_type task = tasks_.pop();
             if (!task) {
                 break;
             }
@@ -52,9 +54,9 @@ private:
     }
 };
 
-template<typename TaskType>
-thread_pool<TaskType>& default_tp() {
-    static thread_pool<TaskType> tp;
+template<std::invocable task_type>
+thread_pool<task_type>& default_tp() {
+    static thread_pool<task_type> tp;
     return tp;
 }
 } // namespace il

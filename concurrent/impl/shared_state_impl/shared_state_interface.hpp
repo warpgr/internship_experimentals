@@ -17,24 +17,24 @@ namespace il { namespace impl {
     assert(!setted.load());
 
 
-template <typename T>
+template <typename T, Mutex mutex_type = il::mutex>
 class shared_state {
-    unique_lock<mutex> wait_() {
-        unique_lock<mutex> lock(guard_);
+    unique_lock<mutex_type> wait_() {
+        unique_lock<mutex_type> lock(guard_);
         is_ready_.wait(lock, [&] { return is_setted_.load(); });
         return lock;
     }
-    unique_lock<mutex> wait_for_set() {
-        unique_lock<mutex> lock(guard_);
+    unique_lock<mutex_type> wait_for_set() {
+        unique_lock<mutex_type> lock(guard_);
         if (!is_first_.exchange(false)) {
             is_ready_.wait(lock, [&] { return !is_setted_.load(); });
         }
         return lock;
     }
 protected:
-    condition_variable<unique_lock<mutex>>              is_ready_;
-    mutex                                               guard_;
-    T                                                   shared_data_; // TODO: must be with allocator // shared_ptr
+    condition_variable<unique_lock<mutex_type>>              is_ready_;
+    mutex_type                                               guard_;
+    T                                                        shared_data_; // TODO: must be with allocator // shared_ptr
     std::shared_ptr<std::exception>                     ex_ptr_ = nullptr;
     std::atomic<bool>                                   is_first_ = { true };
     std::atomic<bool>                                   is_setted_ = { false };
@@ -60,13 +60,15 @@ public: // Receiver interface
        wait_();
     }
     template <typename Rep, typename Period = std::ratio<1>>
+        requires std::is_arithmetic_v<Rep>
     void wait_for(const std::chrono::duration<Rep, Period>& duration) {
-        unique_lock<mutex> lock(guard_);
+        unique_lock<mutex_type> lock(guard_);
         is_ready_.wait_for(lock, duration);
     }
     template <typename Clock, typename Duration = typename Clock::duration>
+        requires std::chrono::is_clock_v<Clock>
     void wait_until(const std::chrono::time_point<Clock, Duration>& timeout_time) {
-        unique_lock<mutex> lock(guard_);
+        unique_lock<mutex_type> lock(guard_);
         is_ready_.wait_until(lock, timeout_time);
     }
 public: // Sender interface
