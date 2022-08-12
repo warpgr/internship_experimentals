@@ -6,11 +6,6 @@
 
 namespace il {
 
-enum launch {
-    asynchronious = 1,
-    deferred = 2
-};
-
 template <typename Func, typename... Args>
 auto async( const launch& launch_type, Func func, Args... args) 
     -> il::future<decltype(func(std::forward<Args>(args)...))> {
