@@ -30,11 +30,13 @@ namespace il {
         }
     public: // Shared Locking
         void lock_shared() {
-            int count_of_shared_threads = count_.load();
-            while(!count_.compare_exchange_weak(count_of_shared_threads, count_of_shared_threads + 1)) { // Exchange weak lets us to return false when it is expected is equal to count
-              do {
-                count_of_shared_threads = count_.load();
-              } while (count_of_shared_threads == -1);
+            while(true) {
+                int count_of_shared_thread = count_.load();
+                if(count_of_shared_thread >= 0) {
+                    if(count_.compare_exchange_weak(count_of_shared_thread, count_of_shared_thread + 1)) {
+                        return;
+                    }
+                }
             }
         }
         // bool try_lock_shared() { //...
