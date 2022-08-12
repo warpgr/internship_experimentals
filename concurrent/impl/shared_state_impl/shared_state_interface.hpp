@@ -7,6 +7,7 @@
 #include <memory>
 #include <atomic>
 #include <iostream>
+#include <functional>
 
 namespace il { namespace impl {
 
@@ -38,6 +39,7 @@ protected:
     std::shared_ptr<std::exception>                     ex_ptr_ = nullptr;
     std::atomic<bool>                                   is_first_ = { true };
     std::atomic<bool>                                   is_setted_ = { false };
+    std::function<void()>                               callback_;
 public:
     shared_state() { };
     shared_state(shared_state&& other) = delete;
@@ -47,6 +49,7 @@ public:
 
 public: // Receiver interface
     T get() {
+        if (callback_) { callback_(); }
         auto lock = wait_();
         if (nullptr != ex_ptr_) {
             throw ex_ptr_;
@@ -102,6 +105,10 @@ public: // Sender interface
         ex_ptr_ = std::make_shared<std::exception>(std::move(ex));
         is_setted_.store(true);
         is_ready_.notify_one();
+    }
+
+    void set_callback(std::function<void()> callback) {
+        callback_ = std::move(callback);
     }
 };
 }}

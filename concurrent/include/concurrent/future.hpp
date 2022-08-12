@@ -85,6 +85,10 @@ public:
     void set_exception(std::exception* ex) {
         state_->set_exception(ex);
     }
+
+    void set_callback(std::function<void()> callback) {
+        state_->set_callback(callback);
+    }
 };
 
 template <typename T>
