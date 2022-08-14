@@ -32,10 +32,32 @@ shared_state_impl/shared_state_interface.hpp
 shared_state_impl/shared_state_interface.hpp
 -
 
+../concurrent/include/concurrent/async.hpp
+concurrent/future.hpp
+-
+thread
+-
+memory
+-
+concurrent/thread_pool.hpp
+-
+
 ../concurrent/include/concurrent/condition_variable.hpp
 atomic
 -
 chrono
+-
+
+../concurrent/include/concurrent/containers/mpmc_queue.hpp
+queue
+-
+boost/optional.hpp
+-
+concurrent/mutex.hpp
+-
+concurrent/unique_lock.hpp
+-
+concurrent/condition_variable.hpp
 -
 
 ../concurrent/include/concurrent/future.hpp
@@ -54,6 +76,16 @@ mutex
 atomic
 -
 
+../concurrent/include/concurrent/thread_pool.hpp
+concurrent/containers/mpmc_queue.hpp
+-
+vector
+-
+thread
+-
+atomic
+-
+
 ../concurrent/include/concurrent/unique_lock.hpp
 chrono
 -
@@ -62,15 +94,11 @@ concurrent/mutex.hpp
 cassert
 -
 
-/home/gexam/internship_experimentals/execs/future_custom_exec.cpp
-concurrent/future.hpp
--
-thread
+/home/gexam/internship_experimentals/execs/custom_async_exec.cpp
+concurrent/async.hpp
 -
 chrono
 -
 iostream
--
-vector
 -
 
