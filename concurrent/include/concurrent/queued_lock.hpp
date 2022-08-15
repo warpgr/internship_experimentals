@@ -51,7 +51,7 @@ public:
 };
 
 
-template <Mutex mutex_type = il::mutex>
+template <Mutex mutex_type = mutex>
 class ticket_lock {
     static std::atomic<int> ticket_;
     static std::atomic<int> current_pos_;
@@ -72,25 +72,25 @@ public:
     ticket_lock& operator=(const ticket_lock& other) = delete;
 };
 
-template <Mutex mutex_type = il::mutex>
+template <Mutex mutex_type>
 void queed_lock<mutex_type>::blocked_threads_queue::push_back(std::thread::id&& tid) {
     lock_guard<mutex> lock(threads_queue_guard_);
     threads_queue_.push(tid);
 }
 
-template <Mutex mutex_type = il::mutex>
+template <Mutex mutex_type>
 bool queed_lock<mutex_type>::blocked_threads_queue::empty() {
     lock_guard<mutex> lock(threads_queue_guard_);
     return threads_queue_.empty();
 }
 
-template <Mutex mutex_type = il::mutex>
+template <Mutex mutex_type>
 std::thread::id queed_lock<mutex_type>::blocked_threads_queue::front() {
     lock_guard<mutex> lock(threads_queue_guard_);
     return std::thread::id(threads_queue_.front());
 }
 
-template <Mutex mutex_type = il::mutex>
+template <Mutex mutex_type>
 void queed_lock<mutex_type>::blocked_threads_queue::pop_front() {
     lock_guard<mutex> lock(threads_queue_guard_);
     threads_queue_.pop();

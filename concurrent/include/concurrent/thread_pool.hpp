@@ -12,7 +12,7 @@ namespace il {
 template <std::invocable task_type>
 class thread_pool {
     mpmc_queue<task_type>     tasks_;
-    std::vector<std::thread> workers_;
+    std::vector<std::thread>  workers_;
 public:
     thread_pool(size_t thread_count = 4) {
         for (int i = 0; i < thread_count; ++i) {

@@ -21,7 +21,7 @@ class mpmc_queue {
         T pop();
     private:
         std::queue<T>                  elements_;
-        mutable il::mutex             elements_guard_;
+        mutable il::mutex              elements_guard_;
         il::condition_variable<il::unique_lock<il::mutex>>
                                        is_not_empty_;
     private:

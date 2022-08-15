@@ -28,7 +28,7 @@ namespace impl {
     assert(!setted.load());
 
 
-template <typename T, Mutex mutex_type = il::mutex>
+template <typename T, Mutex mutex_type = mutex>
 class shared_state {
     unique_lock<mutex_type> wait_() {
         unique_lock<mutex_type> lock(guard_);
