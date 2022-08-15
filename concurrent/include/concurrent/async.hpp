@@ -37,4 +37,9 @@ auto async( const launch& launch_type, Func func)
     return prom->get_future();
 }
 
+#define await(fut) fut.get()
+
+#define lazy_(func) il::async(il::launch::deferred, func)
+#define async_(func) il::async(il::launch::asynchronious, func)
+
 } // namespace il

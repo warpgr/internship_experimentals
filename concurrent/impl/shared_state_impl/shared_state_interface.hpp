@@ -46,11 +46,11 @@ protected:
     condition_variable<unique_lock<mutex_type>>              is_ready_;
     mutex_type                                               guard_;
     T                                                        shared_data_; // TODO: must be with allocator // shared_ptr
-    std::shared_ptr<std::exception>                     ex_ptr_ = nullptr;
-    std::atomic<bool>                                   is_first_  = { true };
-    std::atomic<bool>                                   is_setted_ = { false };
-    std::function<void()>                               callback_;
-    std::function<void()>                               on_complete_;
+    std::shared_ptr<std::exception>                          ex_ptr_ = nullptr;
+    std::atomic<bool>                                        is_first_  = { true };
+    std::atomic<bool>                                        is_setted_ = { false };
+    std::function<void()>                                    lazy_call_; // Bad name.
+    std::function<void()>                                    on_complete_;
 public:
     shared_state() { };
     shared_state(shared_state&& other) = delete;
@@ -60,8 +60,8 @@ public:
 
 public: // Receiver interface
     T get() {
-        if (callback_) { callback_(); }
-        if (on_complete_) { on_complete_(); }
+        if (lazy_call_) { lazy_call_(); } // Works on defferd launch.
+        if (on_complete_) { on_complete_(); } // Works with .then //
         auto lock = wait_();
         if (nullptr != ex_ptr_) {
             throw ex_ptr_;
@@ -144,7 +144,7 @@ public: // Sender interface
     }
 
     void set_callback(std::function<void()> callback) {
-        callback_ = std::move(callback);
+        lazy_call_ = std::move(callback);
     }
 };
 }}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <shared_state_impl/shared_state_interface.hpp>
+#include <concepts>
 
 namespace il { namespace impl {
 
