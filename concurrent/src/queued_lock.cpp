@@ -2,9 +2,6 @@
 
 namespace il {
 
-void queed_lock::blocked_threads_queue::push_back(std::thread::id&& tid) {
-    lock_guard<mutex> lock(threads_queue_guard_);
-    threads_queue_.push(tid);
 }
 bool queed_lock::blocked_threads_queue::empty() {
     lock_guard<mutex> lock(threads_queue_guard_);
