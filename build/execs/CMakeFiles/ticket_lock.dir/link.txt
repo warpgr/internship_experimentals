@@ -1,1 +1,0 @@
-/usr/bin/c++ -rdynamic CMakeFiles/ticket_lock.dir/ticket_lock_exec.cpp.o -o ticket_lock  ../concurrent/libcontainers.a 

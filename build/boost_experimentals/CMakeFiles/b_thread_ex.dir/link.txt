@@ -1,1 +1,0 @@
-/usr/bin/c++ -rdynamic CMakeFiles/b_thread_ex.dir/thread.cpp.o -o b_thread_ex  -Wl,-rpath,/usr/local/lib /usr/local/lib/libboost_filesystem-mt-d-x64.so.1.80.0 /usr/local/lib/libboost_thread-mt-d-x64.so.1.80.0 /usr/local/lib/libboost_chrono-mt-d-x64.so.1.80.0 /usr/local/lib/libboost_atomic-mt-d-x64.so.1.80.0 
