@@ -54,6 +54,11 @@ public:
     bool valid() const  {
         return (nullptr != state_);
     }
+    template <typename Func>
+    auto then(Func&& func, const launch& launch_type = launch::asynchronious) ->
+        future<decltype(func(T()))> {
+        return state_->then(std::forward<Func>(func), launch_type);
+    }
 };
 
 template <typename T>
@@ -89,6 +94,10 @@ public:
     }
     void set_exception(std::exception* ex) {
         state_->set_exception(ex);
+    }
+
+    void set_callback(std::function<void()> callback) {
+        state_->set_callback(callback);
     }
 };
 

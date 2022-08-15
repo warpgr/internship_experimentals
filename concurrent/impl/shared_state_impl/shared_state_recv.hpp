@@ -36,6 +36,12 @@ public:
         return state_->wait_until(timeout_time);
     }
 
+    template <typename Func>
+    auto then(Func&& func, const launch& launch_type = launch::asynchronious) ->
+        future<decltype(func(T()))> {
+        return state_->then(std::forward<Func>(func), launch_type);
+    }
+
     std::shared_ptr<shared_state<T>> state() {
         return state_;
     }
