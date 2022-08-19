@@ -25,7 +25,7 @@ public:
 public:
     void wait(lock_type& lock) {
         lock.unlock();
-        while (!flag_.exchange(false));
+        while (!flag_.exchange(false, std::memory_order_acq_rel));
         lock.lock();
     }
 
@@ -59,7 +59,7 @@ public:
         lock.unlock();
         bool is_notified = false;
         while (std::chrono::system_clock::now() < time_point) {
-            is_notified = flag_.exchange(false);
+            is_notified = flag_.exchange(false, std::memory_order_acq_rel);
             if (is_notified) { break; }
         }
         lock.lock();
@@ -74,7 +74,7 @@ public:
         lock.unlock();
         while (std::chrono::system_clock::now() < time_point) {
             if (pred()) {
-                is_notified = flag_.exchange(false);
+                is_notified = flag_.exchange(false, std::memory_order_acq_rel);
                 if (is_notified) { return true; }
             }
         }
@@ -83,10 +83,10 @@ public:
     }
 
     void notify_one() {
-        flag_.store(true);
+        flag_.store(true, std::memory_order_relaxed);
     }
     void notify_all() {
-        flag_.store(true);
+        flag_.store(true, std::memory_order_relaxed);
     }
 private:
     inline void lock_unlock(lock_type& lock) {
