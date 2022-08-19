@@ -27,7 +27,6 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
 
 set (SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/mutex.cpp
              ${CMAKE_CURRENT_SOURCE_DIR}/src/containers/list.cpp
-             ${CMAKE_CURRENT_SOURCE_DIR}/src/queued_lock.cpp
              ${CMAKE_CURRENT_SOURCE_DIR}/src/condition_variable.cpp )
 
 add_library(containers ${HEADERS} ${SOURCES}  ) #${IMPL_HEADERS}

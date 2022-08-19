@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -11,7 +10,6 @@
 
 # Built Visual Studio Code Extensions
 *.vsix
-=======
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
@@ -23,4 +21,3 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
->>>>>>> master
