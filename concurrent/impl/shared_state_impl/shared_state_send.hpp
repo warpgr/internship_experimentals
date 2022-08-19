@@ -44,5 +44,8 @@ public:
     std::shared_ptr<shared_state<T>> state() {
         return state_;
     }
+    void set_callback(std::function<void()> callback) {
+        state_->set_callback(callback);
+    }
 };
 }}

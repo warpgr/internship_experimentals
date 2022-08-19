@@ -1,6 +1,7 @@
 #pragma once
 
 #include <shared_state_impl/shared_state_interface.hpp>
+#include <concepts>
 
 namespace il { namespace impl {
 
@@ -34,6 +35,12 @@ public:
     void wait_until(const std::chrono::time_point<Clock, Duration>& timeout_time) {
         have_correct_state(state_);
         return state_->wait_until(timeout_time);
+    }
+
+    template <typename Func>
+    auto then(Func&& func, const launch& launch_type = launch::asynchronious) ->
+        future<decltype(func(T()))> {
+        return state_->then(std::forward<Func>(func), launch_type);
     }
 
     std::shared_ptr<shared_state<T>> state() {

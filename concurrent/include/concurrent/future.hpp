@@ -1,13 +1,16 @@
 #pragma once 
-#include <shared_state_impl/shared_state_recv.hpp>
-#include <shared_state_impl/shared_state_send.hpp>
 #include <memory>
 #include <iostream>
+#include <type_traits>
+
+#include <shared_state_impl/shared_state_recv.hpp>
+#include <shared_state_impl/shared_state_send.hpp>
 
 namespace il {
 
 template <typename T>
 class future;
+
 template <typename T>
 future<T> create_future(std::shared_ptr<impl::shared_state<T>> shared_state_ptr);
 
@@ -36,10 +39,12 @@ public:
         state_->wait();
     }
     template <typename Rep, typename Period = std::ratio<1>>
+        requires std::is_arithmetic_v<Rep>
     void wait_for(const std::chrono::duration<Rep, Period>& duration) {
         state_->wait_for(duration);
     }
     template <typename Clock, typename Duration = typename Clock::duration>
+        requires std::chrono::is_clock_v<Clock>
     void wait_until(const std::chrono::time_point<Clock, Duration>& timeout_time) {
         state_->wait_until(timeout_time);
     }
@@ -48,6 +53,11 @@ public:
     }
     bool valid() const  {
         return (nullptr != state_);
+    }
+    template <typename Func>
+    auto then(Func&& func, const launch& launch_type = launch::asynchronious) ->
+        future<decltype(func(T()))> {
+        return state_->then(std::forward<Func>(func), launch_type);
     }
 };
 
@@ -84,6 +94,10 @@ public:
     }
     void set_exception(std::exception* ex) {
         state_->set_exception(ex);
+    }
+
+    void set_callback(std::function<void()> callback) {
+        state_->set_callback(callback);
     }
 };
 
