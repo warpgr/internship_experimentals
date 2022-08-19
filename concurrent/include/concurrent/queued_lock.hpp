@@ -18,6 +18,7 @@ class queed_lock {
         blocked_threads_queue() = default;
         void push_back(std::thread::id&& tid);
         bool empty();
+        
         std::thread::id front();
         void pop_front();
     }                                                threads_queue_;
@@ -47,7 +48,6 @@ public:
         std::cout << "Im have released the lock and my id is "
                   << std::this_thread::get_id() << std::endl << std::flush;
     }
-
 };
 
 
