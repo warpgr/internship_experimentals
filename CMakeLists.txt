@@ -6,9 +6,7 @@ project ( internship_cource )
 find_package ( Boost REQUIRED COMPONENTS filesystem thread chrono )
 find_package ( Threads REQUIRED )
 
-set_property ( GLOBAL PROPERTY CXX_STANDARD 17 )
-# set_property ( GLOBAL PROPERTY CMAKE_CXX_COMPILER_VERSION "10.3.0")
-set_property ( GLOBAL PROPERTY CMAKE_CXX_COMPILER "clang++")
+set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory ( boost_experimentals )
 add_subdirectory ( concurrent )
