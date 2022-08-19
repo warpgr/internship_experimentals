@@ -21,8 +21,14 @@ enum launch {
 };
 namespace impl {
 
+/*
+synchronizes with - no instruction can be
+reordered before an acquire operation
+and no instruction can be reordered after a release operation;
+*/ 
+
 #define have_correct_state(state) assert(nullptr != state);
-#define is_state_shared(shared) assert(shared.load(std::memory_order_acquire)); //synchronizes with
+#define is_state_shared(shared) assert(shared.load(std::memory_order_acquire)); 
 #define is_state_shared_and_is_not_setted(shared, setted ) \
     is_state_shared(shared)\
     assert(!setted.load(std::memory_order_acquire)); //synchronizes with
