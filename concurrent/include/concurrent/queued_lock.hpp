@@ -60,12 +60,16 @@ public:
     ticket_lock() = delete;
     ticket_lock(mutex_type& m)
         : m_(m) {
-            int ticket = ticket_.fetch_add(1);
+            // used order_relaxed because we need atomicity guarantee
+            // only for a single operation i.e. fetch_add
+            int ticket = ticket_.fetch_add(1, std::memory_order_relaxed);
             while (ticket != current_pos_);
             m_.lock();
     }
     ~ticket_lock() {
-        current_pos_.fetch_add(1);
+        // used order_relaxed because we need atomicity guarantee
+        // only for a single operation i.e. fetch_add
+        current_pos_.fetch_add(1, std::memory_order_relaxed);
         m_.unlock();
     }
     ticket_lock(const ticket_lock& other) = delete;
