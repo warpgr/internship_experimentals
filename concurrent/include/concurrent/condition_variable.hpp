@@ -83,10 +83,10 @@ public:
     }
 
     void notify_one() {
-        flag_.store(true, std::memory_order_relaxed);
+        flag_.store(true, std::memory_order_release);
     }
     void notify_all() {
-        flag_.store(true, std::memory_order_relaxed);
+        flag_.store(true, std::memory_order_release);
     }
 private:
     inline void lock_unlock(lock_type& lock) {
