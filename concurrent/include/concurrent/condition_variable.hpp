@@ -25,6 +25,7 @@ public:
 public:
     void wait(lock_type& lock) {
         lock.unlock();
+        // A read-modify-write operation with this memory order is both an acquire operation and a release operation.
         while (!flag_.exchange(false, std::memory_order_acq_rel));
         lock.lock();
     }
@@ -59,6 +60,7 @@ public:
         lock.unlock();
         bool is_notified = false;
         while (std::chrono::system_clock::now() < time_point) {
+            // A read-modify-write operation with this memory order is both an acquire operation and a release operation
             is_notified = flag_.exchange(false, std::memory_order_acq_rel);
             if (is_notified) { break; }
         }
@@ -74,6 +76,7 @@ public:
         lock.unlock();
         while (std::chrono::system_clock::now() < time_point) {
             if (pred()) {
+                // A read-modify-write operation with this memory order is both an acquire operation and a release operation
                 is_notified = flag_.exchange(false, std::memory_order_acq_rel);
                 if (is_notified) { return true; }
             }
@@ -83,9 +86,13 @@ public:
     }
 
     void notify_one() {
+        // A store operation with this memory order performs the release operation: 
+        // no reads or writes in the current thread can be reordered after this store.
         flag_.store(true, std::memory_order_release);
     }
     void notify_all() {
+        // A store operation with this memory order performs the release operation: 
+        // no reads or writes in the current thread can be reordered after this store.
         flag_.store(true, std::memory_order_release);
     }
 private:
