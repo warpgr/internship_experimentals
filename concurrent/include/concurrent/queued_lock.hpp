@@ -18,6 +18,7 @@ class queed_lock {
         blocked_threads_queue() = default;
         void push_back(std::thread::id&& tid);
         bool empty();
+        
         std::thread::id front();
         void pop_front();
     }                                                threads_queue_;
@@ -47,7 +48,6 @@ public:
         std::cout << "Im have released the lock and my id is "
                   << std::this_thread::get_id() << std::endl << std::flush;
     }
-
 };
 
 
@@ -60,12 +60,12 @@ public:
     ticket_lock() = delete;
     ticket_lock(mutex_type& m)
         : m_(m) {
-            int ticket = ticket_.fetch_add(1);
-            while (ticket != current_pos_);
+            int ticket = ticket_.fetch_add(1, std::memory_order_relaxed);
+            while (ticket != current_pos_.load(std::memory_order_acquire));
             m_.lock();
     }
     ~ticket_lock() {
-        current_pos_.fetch_add(1);
+        current_pos_.fetch_add(1, std::memory_order_acq_rel);
         m_.unlock();
     }
     ticket_lock(const ticket_lock& other) = delete;

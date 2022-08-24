@@ -21,24 +21,30 @@ enum launch {
 };
 namespace impl {
 
+/*
+synchronizes with - no instruction can be
+reordered before an acquire operation
+and no instruction can be reordered after a release operation;
+*/ 
+
 #define have_correct_state(state) assert(nullptr != state);
-#define is_state_shared(shared) assert(shared.load());
+#define is_state_shared(shared) assert(shared.load(std::memory_order_acquire)); 
 #define is_state_shared_and_is_not_setted(shared, setted ) \
     is_state_shared(shared)\
-    assert(!setted.load());
+    assert(!setted.load(std::memory_order_acquire)); //synchronizes with
 
 
 template <typename T, Mutex mutex_type = mutex>
 class shared_state {
     unique_lock<mutex_type> wait_() {
         unique_lock<mutex_type> lock(guard_);
-        is_ready_.wait(lock, [&] { return is_setted_.load(); });
+        is_ready_.wait(lock, [&] { return is_setted_.load(std::memory_order_acquire); }); //synchronizes with
         return lock;
     }
     unique_lock<mutex_type> wait_for_set() {
         unique_lock<mutex_type> lock(guard_);
-        if (!is_first_.exchange(false)) {
-            is_ready_.wait(lock, [&] { return !is_setted_.load(); });
+        if (!is_first_.exchange(false, std::memory_order_acq_rel)) { // inter-thread
+            is_ready_.wait(lock, [&] { return !is_setted_.load(std::memory_order_acquire); }); //synchronizes with
         }
         return lock;
     }
@@ -67,7 +73,7 @@ public: // Receiver interface
             throw ex_ptr_;
         }
         T tmp(std::move(shared_data_));
-        is_setted_.store(false);
+        is_setted_.store(false, std::memory_order_release); //synchronizes with
         is_ready_.notify_one();
         return tmp;
     }
@@ -112,25 +118,25 @@ public: // Sender interface
     void set_value(T& value) {
         auto lock = wait_for_set();
         shared_data_ = value;
-        is_setted_.store(true);
+        is_setted_.store(true, std::memory_order_release); //synchronizes with
         is_ready_.notify_one();
     }
     void set_value(T&& value) {
         auto lock = wait_for_set();
         shared_data_ = std::move(value);
-        is_setted_.store(true);
+        is_setted_.store(true, std::memory_order_release); //synchronizes with
         is_ready_.notify_one();
     }
     void set_value(const T& value) {
         auto lock = wait_for_set();
         shared_data_(value);
-        is_setted_.store(true);
+        is_setted_.store(true, std::memory_order_release); //synchronizes with
         is_ready_.notify_one();
     }
     void set_value() {
         auto lock = wait_for_set();
         shared_data_ = T();
-        is_setted_.store(true);
+        is_setted_.store(true, std::memory_order_release); //synchronizes with
         is_ready_.notify_one();
     }
     void set_exception(const std::exception& ex) {
@@ -139,7 +145,7 @@ public: // Sender interface
     void set_exception(std::exception&& ex) {
         auto lock = wait_();
         ex_ptr_ = std::make_shared<std::exception>(std::move(ex));
-        is_setted_.store(true);
+        is_setted_.store(true, std::memory_order_release); //synchronizes with
         is_ready_.notify_one();
     }
 
