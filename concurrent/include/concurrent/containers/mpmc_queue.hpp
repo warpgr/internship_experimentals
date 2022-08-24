@@ -1,4 +1,4 @@
-#include <queue>
+#include <deque>
 #include <boost/optional.hpp>
 #include <concurrent/mutex.hpp>
 #include <concurrent/unique_lock.hpp>
@@ -19,8 +19,10 @@ class mpmc_queue {
         void push(const T&& data);
         boost::optional<T> try_pop();
         T pop();
+        bool erase(T element);
+        bool contains(T element);
     private:
-        std::queue<T>                  elements_;
+        std::deque<T>                  elements_;
         mutable il::mutex              elements_guard_;
         il::condition_variable<il::unique_lock<il::mutex>>
                                        is_not_empty_;
@@ -38,7 +40,7 @@ bool mpmc_queue<T>::empty() const {
 template <typename T>
 void mpmc_queue<T>::push(const T&& data) {
     il::unique_lock<il::mutex> lock(elements_guard_);
-    elements_.push(std::move(data));
+    elements_.push_back(std::move(data));
     is_not_empty_.notify_one();
 }
 
@@ -64,8 +66,24 @@ template <typename T>
 T mpmc_queue<T>::take() {
     assert (!elements_.empty());
     T item =  std::move(elements_.front());
-    elements_.pop();
+    elements_.pop_front();
     return item;
+}
+
+template <typename T> 
+bool mpmc_queue<T>::erase(T element) {
+    il::unique_lock<il::mutex> lock(elements_guard_);
+    auto iter = elements_.erase(
+        std::remove_if(elements_.begin(), elements_.end(), 
+            [element] (T el) { return el == element; }));
+    return (elements_.end() != iter) ? true : false;
+}
+
+template <typename T>
+bool mpmc_queue<T>::contains(T element) {
+    il::unique_lock<il::mutex> lock(elements_guard_);
+    return (elements_.end() != std::find(elements_.begin(), elements_.end(), element) == elements_.end())
+        ? true : false;
 }
 
 } // namespace il

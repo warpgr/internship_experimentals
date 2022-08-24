@@ -1,8 +1,10 @@
 #pragma once
 
 
-namespace il { namespace fiber { namespace impl {
+namespace il { namespace fiber {
 class fiber;
+namespace impl {
+
 using fiber_main_function = void(*)(fiber*);
 
 struct fiber_and_main {

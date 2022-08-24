@@ -40,3 +40,6 @@ target_link_libraries ( pack_task_exec ${CMAKE_THREAD_LIBS_INIT} containers)
 
 add_executable ( custom_async_exec custom_async_exec.cpp )
 target_link_libraries ( custom_async_exec ${CMAKE_THREAD_LIBS_INIT} containers)
+
+add_executable ( simple_fiber_exec simple_fiber_exec.cpp )
+target_link_libraries ( simple_fiber_exec ${CMAKE_THREAD_LIBS_INIT} containers)

@@ -18,7 +18,14 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/future.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/async.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/packaged_task.hpp
-             
+
+
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/fiber.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/thread_pool.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/scheduller.hpp
+
+
+
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_interface.hpp 
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_recv.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_send.hpp
@@ -30,8 +37,10 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
 set (SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/mutex.cpp
              ${CMAKE_CURRENT_SOURCE_DIR}/src/containers/list.cpp
 
-             ${CMAKE_CURRENT_SOURCE_DIR}/src/queued_lock.cpp
              ${CMAKE_CURRENT_SOURCE_DIR}/src/condition_variable.cpp
+
+
+
              ${CMAKE_CURRENT_SOURCE_DIR}/src/fiber/fiber.cpp
 
 
@@ -39,16 +48,6 @@ set (SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/mutex.cpp
              ${CMAKE_CURRENT_SOURCE_DIR}/src/impl/fiber/windows_fiber_impl.cpp
              ${CMAKE_CURRENT_SOURCE_DIR}/src/impl/fiber/posix_fiber_impl.cpp
              )
-# set ( IMPL_HEADERS
-#             ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_interface.hpp 
-#             ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_recv.hpp
-#             ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_send.hpp
-#             ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/common.hpp 
-#             )
-
-# set ( IMPL_SRCS
-            
-#             )
 
 set ( USING_PLATFORM_WIN      0 )
 set ( USING_PLATFORM_LINUX    0 )
@@ -72,11 +71,6 @@ else()
     message (STATUS "USING_PLATFORM_LINUX")
     target_compile_definitions ( containers PUBLIC USING_PLATFORM_LINUX_)
 endif()
-
-# target_compile_definitions ( containers PUBLIC
-#     USING_PLATFORM_WIN   = ${USING_PLATFORM_WIN}
-#     USING_PLATFORM_LINUX = ${USING_PLATFORM_LINUX}
-#     )
 
 target_include_directories ( containers PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
                                                ${CMAKE_CURRENT_SOURCE_DIR}/impl)

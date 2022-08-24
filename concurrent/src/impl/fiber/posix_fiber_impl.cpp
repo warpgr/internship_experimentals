@@ -38,7 +38,6 @@ posix_fiber_impl::posix_fiber_impl(fiber_and_main fib_data, bool is_main_fib)
 
             makecontext(&context_, reinterpret_cast<void(*)()>(&fiber_start), 1, &fiber_and_main_);
         }
-
     }
 posix_fiber_impl::~posix_fiber_impl() { }
 
