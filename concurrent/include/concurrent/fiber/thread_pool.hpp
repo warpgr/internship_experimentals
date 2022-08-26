@@ -1,5 +1,5 @@
 #pragma once
-#include <concurrent/fiber/scheduler.hpp>
+#include <concurrent/fiber/fiber.hpp>
 #include <thread>
 #include <functional>
 #include <memory>
@@ -7,89 +7,69 @@
 namespace il { namespace fiber {
 
 
+template <typename TaskQueueTpye>
+class fiber_executor {
+    std::shared_ptr<TaskQueueTpye<std::function<void()>>>  tasks_;
+public:
+    template <typename FuncType, typename... Args>
+    void submit_task(FuncType&& func, Args&&... args) {
+        tasks_.push(
+            [&] () {
+                func(std::forward<Args>(args)...);
+            });
+    }
+    template <typename FuncType, typename... Args>
+    void execute(FuncType&& func, Args.. args) {
+        auto packed_function = [&] () {
+            func(std::forward<Args>(args)...);
+        };
+        fiber::create(packed_function, "fiber_from_executor");
+    }
 
-template <typename scheduller_type>
-class fiber_and_thread {
-    struct thread_local_data {
-        std::shared_ptr<scheduller_type> scheduller_;
-        fiber*                           active_fiber_;
-    };
-    static thread_local
-    std::unique_ptr<thread_local_data> 
-                                     thread_local_data_ = std::make_unique<thread_local_data>();
-    std::thread                      thread_;
-    
-private:
-    void worker_routine() {
+    void execute_all() {
         while (true) {
-            fiber* next_fiber = thread_local_data_->scheduller_->next(active_fiber_);
-            fiber::yield_to(*active_fiber_, *next_fiber);
+            auto task = tasks_.pop();
+            if (!task) { return; }
+            execute(task);
         }
     }
-public:
-    fiber_and_thread(std::shared_ptr<scheduller_type> scheduller) {
-        set_scheduller(scheduller);
-    }
-
-    void set_scheduler(std::shared_ptr<scheduller_type> new_scheduler) {
-        thread_local_data_->scheduller_ = scheduller;
-    }
-
-public:
-    static void yield();
-};
-
-template <typename scheduller_type>
-void fiber_and_thread<scheduller_type>::yield() {
-    assert(thread_local_data_ && thread_local_data_->active_fiber_ && thread_local_data_->scheduler_);
-
-    fiber* next_fib = thread_local_data_->scheduler_->next();
-    if (!next_fib) { return; }
-
-    assert(next_fib->is_valid() && !next_fib->is_active() && !next_fib->is_finished());
-    assert(next_fib != thread_local_data_->active_fiber_);
-
-    fiber* current_fib = thread_local_data_->active_fiber_;
-    thread_local_data_->active_fiber_ = next_fib;
-    yield_to(*current_fib, *next_fib);
 }
 
-
-
-template <typename task_type, typename scheduller_type = round_robin_scheduler>
+template <typename task_type, typename executor_type>
 class thread_pool {
-    scheduller_type           scheduller_;
+    executor_type<task_type>  executor_;
     std::vector<std::thread>  workers_;
 public:
     thread_pool(size_t thread_count = 4) {
         for (int i = 0; i < thread_count; ++i) {
             workers_.emplace_back(std::thread(
                 [this] () {
-                    worker_routine();
+                    executor_.execute_all();
                 }
             ));
         }
     }
     ~thread_pool() {
-        while (!tasks_.empty());// TODO:
         join();
     }
     void put_task(task_type&& task) {
-        tasks_.push(std::move(task));
+        executor_.submit_task(task);
     }
     thread_pool(const thread_pool&) = delete;
     thread_pool(thread_pool&&) = delete;
     thread_pool& operator=(const thread_pool&) = delete;
     thread_pool&& operator=(thread_pool&&) = delete;
 private:
-    
     void join() {
-        // for (int i = 0; i < workers_.size(); ++i) {
-        //     tasks_.push({});
-        // }
-        // for (auto& worker : workers_) {
-        //     if (worker.joinable()) { worker.join(); }
-        // }
+        for (int i = 0; i < workers_.size(); ++i) {
+            submit_empty_task();
+        }
+        for (auto& worker : workers_) {
+            if (worker.joinable()) { worker.join(); }
+        }
+    }
+    void submit_empty_task() {
+        executor_.submit_task({});
     }
 };
 

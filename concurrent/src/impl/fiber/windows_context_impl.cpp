@@ -1,4 +1,4 @@
-#include <concurrent/fiber/windows_fiber_impl.hpp>
+#include <concurrent/fiber/windows_context_impl.hpp>
 
 #include <cassert>
 
@@ -8,7 +8,7 @@
 
 namespace il { namespace fiber { namespace impl {
 
-windows_fiber_impl::windows_fiber_impl(fiber_and_main fiber_data, bool is_main_fiber) {
+windows_context_impl::windows_context_impl(fiber_and_main fiber_data, bool is_main_fiber) {
     : address_(nullptr), is_main_fiber_(is_main_fiber), fiber_and_main_(fiber_data) {
         assert(fiber_and_main_.fib && fiber_and_main_.main_function);
 
@@ -26,7 +26,7 @@ windows_fiber_impl::windows_fiber_impl(fiber_and_main fiber_data, bool is_main_f
     }
 }
 
-windows_fiber_impl::~windows_fiber_impl() {
+windows_context_impl::~windows_context_impl() {
     if (is_main_fiber_) {
         assert(is_valid());
         bool success = ConvertFiberToThread() != 0;
@@ -37,7 +37,7 @@ windows_fiber_impl::~windows_fiber_impl() {
     }
 }
 
-void windows_fiber_impl::swap(windows_fiber_impl& from, windows_fiber_impl& to) {
+void windows_context_impl::swap(windows_context_impl& from, windows_context_impl& to) {
     assert(from.is_valid() && to.is_valid() && GetCurrentFiber() == from.address_ && GetCurrentFiber() != to.address_);
     SwitchToFiber(to.address_)
 }

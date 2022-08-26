@@ -1,4 +1,4 @@
-#include <fiber/posix_fiber_impl.hpp>
+#include <fiber/posix_context_impl.hpp>
 
 #include <sys/resource.h>
 
@@ -18,13 +18,13 @@ std::size_t get_stack_size() {
     return stack_size;
 }
 
-void fiber_start(fiber_and_main* fib_and_main) {
-    fib_and_main->main_function(fib_and_main->fib);
+void fiber_start(fiber_and_routine* fib_and_routine) {
+    fib_and_routine->routine_function_(fib_and_routine->fiber_);
 }
 
-posix_fiber_impl::posix_fiber_impl(fiber_and_main fib_data, bool is_main_fib)
-    : context_{}, stack_(nullptr), is_valid_(true), fiber_and_main_(fib_data) {
-        assert(fiber_and_main_.fib && fiber_and_main_.main_function);
+posix_context_impl::posix_context_impl(fiber_and_routine fib_data, bool is_main_fib)
+    : context_{}, stack_(nullptr), is_valid_(true), fiber_and_routine_(fib_data) {
+        assert(fiber_and_routine_.fiber_ && fiber_and_routine_.routine_function_);
 
         is_valid_ = (getcontext(&context_) == 0);
 
@@ -36,12 +36,12 @@ posix_fiber_impl::posix_fiber_impl(fiber_and_main fib_data, bool is_main_fib)
             context_.uc_stack.ss_size = stack_size;
             context_.uc_link = nullptr;
 
-            makecontext(&context_, reinterpret_cast<void(*)()>(&fiber_start), 1, &fiber_and_main_);
+            makecontext(&context_, reinterpret_cast<void(*)()>(&fiber_start), 1, &fiber_and_routine_);
         }
     }
-posix_fiber_impl::~posix_fiber_impl() { }
+posix_context_impl::~posix_context_impl() { }
 
-void posix_fiber_impl::swap(posix_fiber_impl& from, posix_fiber_impl& to) {
+void posix_context_impl::swap(posix_context_impl& from, posix_context_impl& to) {
    assert(from.is_valid() && to.is_valid());
    bool success = (swapcontext(&from.context_, &to.context_) == 0);
    assert(success);

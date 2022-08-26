@@ -2,15 +2,15 @@
 
 #ifdef USING_PLATFORM_WIN_
 
-#include <fiber/windows_fiber_impl.hpp>
+#include <fiber/windows_context_impl.hpp>
 namespace il  { namespace fiber { namespace impl {
-using fiber_impl = windows_fiber_impl;
+using context_impl = windows_context_impl;
 }}}
 #endif
 #ifdef USING_PLATFORM_LINUX_
 
-#include <fiber/posix_fiber_impl.hpp>
+#include <fiber/posix_context_impl.hpp>
 namespace il { namespace fiber { namespace impl  {
-using fiber_impl = posix_fiber_impl;
+using context_impl = posix_context_impl;
 }}}
 #endif

@@ -1,18 +1,23 @@
 #pragma once
 #include <memory>
 #include <functional>
-#include <fiber/fiber_impl.hpp>
+#include <fiber/context_impl.hpp>
+#include <concurrent/fiber/scheduller.hpp>
 
 namespace il { namespace fiber {
 
-class fiber {
+class fiber : public std::enable_shared_from_this<fiber> {
 public:
-    static fiber& get_main_fiber();
-    static fiber* get_active_fiber();
-    static std::unique_ptr<fiber> create(const std::function<void()>& function, const std::string& name = "fiber");
-    static void yield_to(fiber& from, fiber& to);
+    static fiber_ptr get_main_fiber();
+    static fiber_ptr get_active_fiber();
+    static fiber_ptr create(const std::function<void()>& function, const std::string& name = "fiber");
+    static void yield_to(fiber_ptr f);
+    static void yield();
+    static void set_scheduler(std::unique_ptr<scheduler> new_scheduler);
 
 public:
+    fiber(const std::function<void()>& func, const std::string& name, bool is_main_fiber);
+
     ~fiber();
 
     const std::string& name() const {
@@ -20,7 +25,7 @@ public:
     }
 
     bool is_active() const {
-        return true;
+        return thread_local_d->scheduler_->get_active_fiber().get() == this;
     }
 
     bool is_finished() const {
@@ -32,26 +37,36 @@ public:
     }
 
 private:
-    static void fiber_main(fiber* fib);
-    fiber(const std::function<void()>& func, const std::string& name, bool is_main_fiber);
+    static void fiber_routine(fiber_ptr fib);
+    static fiber_ptr create(const std::function<void()>& function, const std::string& name, bool is_main_fiber);
     fiber(const fiber& other) = delete;
     fiber(fiber&& other) = delete;
     fiber& operator=(const fiber& other) = delete;
     fiber& operator=(fiber&& other) = delete;
 
     bool is_valid() const {
-        return impl_.is_valid();
+        return impl_->is_valid();
     }
 
     void finish();
 
+    struct thread_local_data {
+        thread_local_data(std::unique_ptr<scheduler> initial_shceduler)
+            : scheduler_(std::move(initial_shceduler)) { }
+
+        std::unique_ptr<scheduler>      scheduler_;
+        std::vector<fiber_ptr>          fibers_;
+    };
+
 private:
-    std::function<void()>              function_;
-    std::string                        fiber_name_;
-    const bool                         is_main_fiber_;
-    bool                               is_finished_;
-    bool                               is_active_ = { false };
-    impl::fiber_impl                   impl_;
+
+    static thread_local std::shared_ptr<thread_local_data> thread_local_d;
+    std::function<void()>                                  function_;
+    std::string                                            fiber_name_;
+    const bool                                             is_main_fiber_;
+    bool                                                   is_finished_;
+    std::shared_ptr<impl::context_impl>                    impl_;
+    std::shared_ptr<thread_local_data>                     data_;
 };
 
 }}

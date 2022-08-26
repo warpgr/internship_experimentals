@@ -23,15 +23,16 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/fiber.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/thread_pool.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/scheduller.hpp
-
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/round_robin_scheduller.hpp
 
 
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_interface.hpp 
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_recv.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_send.hpp
-             ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/common.hpp
-             ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/windows_fiber_impl.hpp
-             ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/posix_fiber_impl.hpp
+
+             ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/posix_context_impl.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/windows_context_impl.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/context_impl.hpp
              )
 
 set (SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/mutex.cpp
@@ -45,21 +46,16 @@ set (SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/mutex.cpp
 
 
 
-             ${CMAKE_CURRENT_SOURCE_DIR}/src/impl/fiber/windows_fiber_impl.cpp
-             ${CMAKE_CURRENT_SOURCE_DIR}/src/impl/fiber/posix_fiber_impl.cpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/src/impl/fiber/windows_context_impl.cpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/src/impl/fiber/posix_context_impl.cpp
              )
 
-set ( USING_PLATFORM_WIN      0 )
-set ( USING_PLATFORM_LINUX    0 )
-
 if ( WIN32 )
-    set ( USING_PLATFORM_WIN 1 )
-    list ( REMOVE_ITEM HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/posix_fiber_impl.hpp" )
-    list ( REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/impl/fiber/posix_fiber_impl.cpp" )
+    list ( REMOVE_ITEM HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/posix_context_impl.hpp" )
+    list ( REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/impl/fiber/posix_context_impl.cpp" )
 elseif( LINUX )
-    set ( USING_PLATFORM_LINUX 1 )
-    list ( REMOVE_ITEM HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/windows_fiber_impl.hpp" )
-    list ( REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/impl/fiber/windows_fiber_impl.cpp" )
+    list ( REMOVE_ITEM HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/windows_context_impl.hpp" )
+    list ( REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/impl/fiber/windows_context_impl.cpp" )
 endif()
 
 add_library(containers ${HEADERS} ${SOURCES} )
@@ -73,5 +69,6 @@ else()
 endif()
 
 target_include_directories ( containers PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-                                               ${CMAKE_CURRENT_SOURCE_DIR}/impl)
+                                               ${CMAKE_CURRENT_SOURCE_DIR}/impl
+                            )
 

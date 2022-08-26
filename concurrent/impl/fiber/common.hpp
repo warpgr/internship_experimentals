@@ -1,17 +1,18 @@
 #pragma once
-
+#include <memory>
 
 namespace il { namespace fiber {
 class fiber;
+typedef std::shared_ptr<fiber> fiber_ptr;
 namespace impl {
 
-using fiber_main_function = void(*)(fiber*);
+using fiber_routine_function = void(*)(fiber_ptr);
 
-struct fiber_and_main {
-    fiber*              fib;
-    fiber_main_function main_function;
+struct fiber_and_routine {
+    fiber_ptr               fiber_;
+    fiber_routine_function  routine_function_;
 
-    fiber_and_main(fiber* f, fiber_main_function main_func)
-        : fib(f), main_function(main_func) { }
+    fiber_and_routine(fiber_ptr f, fiber_routine_function main_func)
+        : fiber_(f), routine_function_(main_func) { }
 };
 }}}
