@@ -14,6 +14,6 @@ public:
     virtual void on_fiber_finished(fiber_ptr fib) = 0;
     virtual void on_fiber_yield_to(fiber_ptr fib) = 0;
     virtual fiber_ptr get_active_fiber() = 0;
-    virtual void set_active_fiber(fiber_ptr fib) = 0;
+    // virtual void set_active_fiber(fiber_ptr fib) = 0;
 };
 }}

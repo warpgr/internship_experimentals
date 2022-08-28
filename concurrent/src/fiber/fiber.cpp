@@ -17,11 +17,6 @@ fiber_ptr fiber::get_main_fiber() {
     return main_fiber;
 }
 
-fiber_ptr fiber::get_active_fiber() {
-    assert(thread_local_d);
-    return thread_local_d->scheduler_->get_active_fiber();
-}
-
 fiber_ptr fiber::create(const std::function<void()>& func, const std::string& name) {
     get_main_fiber();
     return create(func, name, false);
@@ -29,47 +24,18 @@ fiber_ptr fiber::create(const std::function<void()>& func, const std::string& na
 
 void fiber::yield_to(fiber_ptr fib) {
     assert(fib->is_valid() && !fib->is_active() && !fib->is_finished());
-    assert(thread_local_d && thread_local_d->scheduler_->get_active_fiber());
-    assert(thread_local_d->scheduler_->get_active_fiber()->is_valid() && thread_local_d->scheduler_->get_active_fiber()->is_active());
-    assert(fib != thread_local_d->scheduler_->get_active_fiber());
-
-    thread_local_d->scheduler_->on_fiber_yield_to(fib);
+    if (thread_local_d->scheduler_->get_active_fiber() == fib) { return; }
 
     impl::context_impl& from = *(thread_local_d->scheduler_->get_active_fiber()->impl_.get());
     impl::context_impl& to = *(fib->impl_.get());
-    thread_local_d->scheduler_->set_active_fiber(fib);
+    thread_local_d->scheduler_->on_fiber_yield_to(fib);
     impl::context_impl::swap(from, to);
 }
 
 void fiber::yield() {
-    assert(thread_local_d && thread_local_d->scheduler_->get_active_fiber() && thread_local_d->scheduler_);
-
     fiber_ptr next_fib = thread_local_d->scheduler_->next();
-    if (!next_fib) {
-        return;
-    }
-
-    assert(next_fib->is_valid() && !next_fib->is_finished()); // !next_fib->is_active()
-    // assert(next_fib != thread_local_d->scheduler_->get_active_fiber()); // TODO: check activities
-
+    if (!next_fib) { return; }
     yield_to(next_fib);
-}
-
-void fiber::set_scheduler(std::unique_ptr<scheduler> new_scheduler) {
-    assert(thread_local_d);
-
-    if (new_scheduler) {
-        thread_local_d->scheduler_ = std::move(new_scheduler);
-
-        for (fiber_ptr fib : thread_local_d->fibers_) {
-            assert(fib->is_valid());
-            thread_local_d->scheduler_->on_fiber_created(fib);
-        }
-
-        if (thread_local_d->scheduler_->get_active_fiber()) {
-            thread_local_d->scheduler_->on_fiber_yield_to(thread_local_d->scheduler_->get_active_fiber());
-        }
-    }
 }
 
 void fiber::fiber_routine(fiber_ptr fib) {
@@ -88,21 +54,8 @@ void fiber::fiber_routine(fiber_ptr fib) {
 fiber_ptr fiber::create(const std::function<void()>& function, const std::string& name, bool is_main_fiber) {
     fiber_ptr new_fiber = std::make_shared<fiber>(function, name, is_main_fiber);
     new_fiber->impl_ = std::make_shared<impl::context_impl>(impl::fiber_and_routine(new_fiber, &fiber::fiber_routine), is_main_fiber);
-    if (!new_fiber->is_valid()) {
-        return nullptr;
-    }
-    if (is_main_fiber) {
-        assert(new_fiber->is_valid() && function == nullptr && thread_local_d && thread_local_d->scheduler_->get_active_fiber() == nullptr);
-        thread_local_d->scheduler_->set_active_fiber(new_fiber);
-    }
-    if (new_fiber->is_valid() && !is_main_fiber) {
-        thread_local_d->fibers_.push_back(new_fiber);
-        thread_local_d->scheduler_->on_fiber_created(new_fiber);
-
-        // if (is_main_fiber) {
-        //     thread_local_d->scheduler_->on_fiber_yield_to(new_fiber);
-        // }
-    }
+    if (!new_fiber->is_valid()) { return nullptr; }
+    thread_local_d->scheduler_->on_fiber_created(new_fiber);
     return new_fiber;
 }
 
@@ -124,12 +77,8 @@ fiber::~fiber() {
 
 void fiber::finish() {
     assert(is_valid() && !is_finished());
-
     is_finished_ = true;
-
-    data_->scheduler_->on_fiber_finished(shared_from_this());
-    data_->fibers_.erase(std::remove_if(data_->fibers_.begin(), data_->fibers_.end(), [this_shared_ptr = shared_from_this()] (const fiber_ptr fib) { return fib == this_shared_ptr; }), data_->fibers_.end());
+    fiber_ptr fib = shared_from_this();
 }
-
 
 }}

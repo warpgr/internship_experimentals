@@ -37,11 +37,14 @@ int main(int argc, char** argv) {
     std::cout << "main(): In Main fiber between yield()." << std::endl;
     il::fiber::fiber::yield();
     std::cout << "main(): In Main fiber after yield()." << std::endl;
-
+    il::fiber::fiber::yield();
+    il::fiber::fiber::yield();
+    il::fiber::fiber::yield();
+    il::fiber::fiber::yield();
 
     int x = 0;
     auto fibre_4 = il::fiber::fiber::create([&x]() { ++x; }, "Fourth fiber");
-
+    std::cout << "-----------------------------------------------------" << std::endl;
     std::cout << "main(): Main fiber before yield()." << std::endl;
     std::cout << "main(): x = " << x << std::endl;
     il::fiber::fiber::yield_to(fibre_4);
