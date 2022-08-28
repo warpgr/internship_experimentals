@@ -36,6 +36,10 @@ public:
         return is_main_fiber_;
     }
 
+    bool is_valid() const {
+        return impl_->is_valid();
+    }
+
 private:
     static void fiber_routine(fiber_ptr fib);
     static fiber_ptr create(const std::function<void()>& function, const std::string& name, bool is_main_fiber);
@@ -43,10 +47,6 @@ private:
     fiber(fiber&& other) = delete;
     fiber& operator=(const fiber& other) = delete;
     fiber& operator=(fiber&& other) = delete;
-
-    bool is_valid() const {
-        return impl_->is_valid();
-    }
 
     void finish();
 
