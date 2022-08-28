@@ -9,11 +9,11 @@ namespace il { namespace fiber {
 class fiber : public std::enable_shared_from_this<fiber> {
 public:
     static fiber_ptr get_main_fiber();
-    static fiber_ptr get_active_fiber();
+    // static fiber_ptr get_active_fiber();
     static fiber_ptr create(const std::function<void()>& function, const std::string& name = "fiber");
     static void yield_to(fiber_ptr f);
     static void yield();
-    static void set_scheduler(std::unique_ptr<scheduler> new_scheduler);
+    // static void set_scheduler(std::unique_ptr<scheduler> new_scheduler);
 
 public:
     fiber(const std::function<void()>& func, const std::string& name, bool is_main_fiber);
@@ -55,7 +55,6 @@ private:
             : scheduler_(std::move(initial_shceduler)) { }
 
         std::unique_ptr<scheduler>      scheduler_;
-        std::vector<fiber_ptr>          fibers_;
     };
 
 private:
