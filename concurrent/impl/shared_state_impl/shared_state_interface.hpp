@@ -108,7 +108,7 @@ public: // Receiver interface
             }
             case launch::asynchronious:
             default: {
-                default_tp<std::function<void()>>().put_task(std::move(on_complete));
+                default_tp().put_task(std::move(on_complete));
                 break;
             }
         }

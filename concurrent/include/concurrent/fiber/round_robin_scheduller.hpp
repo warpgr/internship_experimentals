@@ -25,6 +25,10 @@ public:
         return next_fiber_for_this_thread;
     }
 
+    bool is_not_empty_queue() {
+        return !fiber_queue_.empty();
+    }
+
     virtual void on_fiber_created(fiber_ptr fib) override {
         if (!fib->is_valid() && fib->is_finished()) { return; }
         if (!check_and_create_main_fiber_for_this_thread(fib)) {

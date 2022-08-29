@@ -23,7 +23,7 @@ auto async( const launch& launch_type, Func func)
         }
         case launch::asynchronious:
         default: {
-            auto& tp = default_tp<std::function<void()>>();
+            auto& tp = default_tp();
             tp.put_task(
                 [task_promise = prom, &func] () mutable {
                     decltype(func()) res = func();

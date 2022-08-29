@@ -7,7 +7,7 @@
 
 namespace il { namespace fiber {
 
-thread_local std::shared_ptr<fiber::thread_local_data> fiber::thread_local_d(new fiber::thread_local_data(std::make_unique<round_robin_scheduler>()));
+thread_local std::shared_ptr<fiber::thread_local_data> fiber::thread_local_d(new fiber::thread_local_data(std::make_shared<round_robin_scheduler>()));
 
 
 fiber_ptr fiber::get_main_fiber() {
@@ -51,6 +51,10 @@ void fiber::fiber_routine(fiber_ptr fib) {
     assert(false);
 }
 
+std::shared_ptr<scheduler> fiber::get_scheduler() {
+    return thread_local_d->scheduler_;
+}
+
 fiber_ptr fiber::create(const std::function<void()>& function, const std::string& name, bool is_main_fiber) {
     fiber_ptr new_fiber = std::make_shared<fiber>(function, name, is_main_fiber);
     new_fiber->impl_ = std::make_shared<impl::context_impl>(impl::fiber_and_routine(new_fiber, &fiber::fiber_routine), is_main_fiber);
@@ -78,7 +82,6 @@ fiber::~fiber() {
 void fiber::finish() {
     assert(is_valid() && !is_finished());
     is_finished_ = true;
-    fiber_ptr fib = shared_from_this();
 }
 
 }}

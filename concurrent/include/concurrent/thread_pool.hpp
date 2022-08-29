@@ -9,44 +9,70 @@
 
 namespace il {
 
-template <std::invocable task_type>
+
+class function_executor {
+    // std::shared_ptr<TaskQueueTpye<std::function<void()>>>  tasks_;
+    std::shared_ptr<mpmc_queue<std::function<void()>>>     tasks_;
+public:
+    function_executor() {
+        tasks_ = std::make_shared<mpmc_queue<std::function<void()>>>();
+    }
+    template <typename FuncType, typename... Args>
+    void submit_task(FuncType&& func, Args&&... args) {
+        tasks_->push(
+            [&] () {
+                func(std::forward<Args>(args)...);
+            });
+    }
+
+    void submit_empty_task() {
+        tasks_->push({});
+    }
+    template <typename FuncType, typename... Args>
+    void execute(FuncType&& func, Args... args) {
+        [&] () {
+            func(std::forward<Args>(args)...);
+        }();
+    }
+
+    void execute_all() {
+        while (true) {
+            auto task = tasks_->pop();
+            if (!task) { break; }
+            execute(task);
+        }
+    }
+};
+
+template <typename executor_type = function_executor>
 class thread_pool {
-    mpmc_queue<task_type>     tasks_;
+    executor_type             executor_;
     std::vector<std::thread>  workers_;
 public:
     thread_pool(size_t thread_count = 4) {
         for (int i = 0; i < thread_count; ++i) {
             workers_.emplace_back(std::thread(
                 [this] () {
-                    worker_routine();
+                    executor_.execute_all();
                 }
             ));
         }
     }
     ~thread_pool() {
-        while (!tasks_.empty());// TODO:
         join();
     }
-    void put_task(task_type&& task) {
-        tasks_.push(std::move(task));
+    template <typename Func, typename... Args>
+    void put_task(Func&& func, Args&&... args) {
+        executor_.submit_task(std::forward<Func>(func), std::forward<Args>(args)...);
     }
     thread_pool(const thread_pool&) = delete;
     thread_pool(thread_pool&&) = delete;
     thread_pool& operator=(const thread_pool&) = delete;
     thread_pool&& operator=(thread_pool&&) = delete;
 private:
-    void worker_routine() {
-        while (true) {
-            task_type task = tasks_.pop();
-            if (!task) {
-                break;
-            }
-            task();
-        }
-    }
     void join() {
         for (int i = 0; i < workers_.size(); ++i) {
-            tasks_.push({});
+            executor_.submit_empty_task();
         }
         for (auto& worker : workers_) {
             if (worker.joinable()) { worker.join(); }
@@ -54,9 +80,9 @@ private:
     }
 };
 
-template<std::invocable task_type>
-thread_pool<task_type>& default_tp() {
-    static thread_pool<task_type> tp;
+template<typename executor_type = function_executor>
+thread_pool<executor_type>& default_tp() {
+    static thread_pool<executor_type> tp;
     return tp;
 }
 } // namespace il

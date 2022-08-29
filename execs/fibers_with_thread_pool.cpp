@@ -11,17 +11,17 @@ int main() {
     {
         il::fiber::thread_pool<il::fiber::fiber_executor> tp;
 
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             tp.put_task(
                 [&] () {
+                    std::stringstream ss;
+                    ss << "This tid is " << std::this_thread::get_id() << '\n';
+                    std::cout << ss.str();
+                    il::fiber::fiber::yield();
                     {
                         il::unique_lock<il::mutex> lock(num_guard);
                         ++num;
                     }
-                    il::fiber::fiber::yield();
-                    std::stringstream ss;
-                    ss << "This tid is " << std::this_thread::get_id() << '\n';
-                    std::cout << ss.str();
                 }
             );
         }

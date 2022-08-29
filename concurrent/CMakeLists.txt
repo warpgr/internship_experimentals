@@ -21,7 +21,8 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
 
 
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/fiber.hpp
-             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/thread_pool.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/executor.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/asio.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/scheduller.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/round_robin_scheduller.hpp
 
