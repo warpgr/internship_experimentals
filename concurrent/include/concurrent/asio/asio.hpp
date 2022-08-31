@@ -2,6 +2,8 @@
 #include <concurrent/fiber/thread_pool.hpp>
 
 #include <concurent/thread_pool.hpp>
+
+#include <concurrent/asio/error_code.hpp>
 #include <sys/socket.h>
 #include <array>
 
@@ -41,20 +43,29 @@ public:
     }
 };
 
+struct buffer {
+    std::array<uint8_t, 1024> buffer_;
+};
+
+struct error_code {
+    
+};
+
+
+
 class socket {
     io_context& context_;
     endpoint    endpoint_;
     int         listenfd_;
 public:
 
-    socket(io_context& context, const char* address, uint8_t port)
+    socket(io_context& context, const char* address, uint8_t port, error_code& ec)
     : context_(context) {
     , endpoint_(address, port)
 
     listenfd_ = socket(AF_INET, SOCK_STREAM, 0);
     if (listenfd < 0) {
-        std::cerr << "Error opening socket\n";
-        std::exit(1); // TODO: handle on other way
+        ec = error_code(error_number::socket_open_error, "Socket creation error.");
     }
     void bind() {
         if (bind(listenfd, (sockaddr *) &servAddr, sizeof(servAddr)) < 0) {
@@ -71,38 +82,54 @@ public:
         }
     }
 
-    void async_read(std:array<uint8_t, 1024>& buffer) {
+    void connect() {
+
+    }
+
+    void accept() {
+
+    }
+
+    void async_read(std:array<uint8_t, 1024>& buffer, error_code& ec) {
         context_.post(
             [&] () {
-                c_style_read();
+                c_style_read(buffer, ec);
             }
         )
     }
 
-    void async_write(std:array<uint8_t, 1024>& buffer) {
+    void async_write(std:array<uint8_t, 1024>& buffer, error_code& ec) {
         size_t bytes_transfered = 0;
         context_.post(
             [&] () {
-                bytes_transfered = c_style_write(buffer);
+                bytes_transfered = c_style_write(buffer, ec);
             }
         );
     }
 
 
 private:
-    size_t c_style_read(const char** buffer) {
+    size_t c_style_read(const char** buffer, error_code& ec) {
         while ( true ) {
             bzero(*buffer, MAXLINE);
-            size_t bytes_transfered = recv(listenfd_, *buffer);
-            if (bytes_transfered <= 0) {
+            ssize_t bytes_transfered = read(listenfd_, *buffer, SSIZE_MAX);
+            switch (bytes_transfered) {
+            case 0:
                 fiber::yield();
+                break;
+            case -1:
+                ec = error_code(error_number::socket_read_error, "Socket read error.");
+                break;
             }
             return bytes_transfered;
         }
     }
 
-    size_t c_style_write(const char** buffer) {
-        send(listenfd_, *buffer);
+    size_t c_style_write(const char** buffer, error_code& ec) {
+        ssize_t bytes_transferd = write(listenfd_, *buffer, SSIZE_MAX);
+        if ( bytes_transferd < 0 ) {
+            ec = error_code(error_number::socket_write_error, "Socket read error.");
+        }
     }
 };
 

@@ -22,10 +22,12 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
 
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/fiber.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/executor.hpp
-             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/asio.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/scheduller.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/round_robin_scheduller.hpp
 
+
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/asio.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/asio/error_code.hpp
 
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_interface.hpp 
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_recv.hpp

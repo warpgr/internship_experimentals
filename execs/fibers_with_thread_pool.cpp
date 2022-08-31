@@ -1,15 +1,15 @@
-#include <concurrent/fiber/thread_pool.hpp>
 #include <concurrent/mutex.hpp>
 #include <concurrent/unique_lock.hpp>
 #include <sstream>
 #include <iostream>
-
+#include <concurrent/fiber/executor.hpp>
+#include <concurrent/thread_pool.hpp>
 
 int main() {
     int num = 0;
     il::mutex num_guard;
     {
-        il::fiber::thread_pool<il::fiber::fiber_executor> tp;
+        il::thread_pool<il::fiber::fiber_executor> tp;
 
         for (int i = 0; i < 1000; ++i) {
             tp.put_task(

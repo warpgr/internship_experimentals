@@ -1,3 +1,5 @@
+#pragma once
+
 #include <deque>
 #include <boost/optional.hpp>
 #include <concurrent/mutex.hpp>

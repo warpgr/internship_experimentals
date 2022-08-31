@@ -12,7 +12,7 @@ int main() {
     il::mutex num_guard;
     {
         // std::shared_ptr<il::thread_pool<std::function<void()>>> tp_ptr = std::make_shared<il::thread_pool<std::function<void()>>>(10);
-        auto tp_ptr = &il::default_tp();
+        auto tp_ptr = &il::default_tp<>();
         std::cout << "main(): after thread_pool creation" << std::endl;
         for (int i = 0; i < 100; ++i) {
             std::stringstream sstrea;

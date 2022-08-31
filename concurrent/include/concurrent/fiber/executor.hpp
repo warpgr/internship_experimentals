@@ -10,7 +10,6 @@
 namespace il { namespace fiber {
 
 class fiber_executor {
-    // std::shared_ptr<TaskQueueTpye<std::function<void()>>>  tasks_;
     std::shared_ptr<mpmc_queue<std::function<void()>>>     tasks_;
 public:
     fiber_executor() {
@@ -43,7 +42,6 @@ public:
             execute(task);
         }
         while (fiber::get_scheduler()->is_not_empty_queue()) {
-            std::cout << " yielding while is not empty\n ";
             fiber::yield();
         }
     }

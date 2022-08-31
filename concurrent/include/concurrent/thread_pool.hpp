@@ -9,19 +9,30 @@
 
 namespace il {
 
+// template <typename T>
+// concept Executor = requires(T e) {
+//     { 
+//         std::invocable<std::function<void()>> f;
+//         e.submit_task(f) };
+//     { e.submit_empty_task() };
+//     { 
+//         std::invocable<std::function<void()>> f;
+//         e.execute() };
+//     { e.execute_all() };
+// };
+
 
 class function_executor {
-    // std::shared_ptr<TaskQueueTpye<std::function<void()>>>  tasks_;
     std::shared_ptr<mpmc_queue<std::function<void()>>>     tasks_;
 public:
     function_executor() {
         tasks_ = std::make_shared<mpmc_queue<std::function<void()>>>();
     }
-    template <typename FuncType, typename... Args>
-    void submit_task(FuncType&& func, Args&&... args) {
+    template <std::invocable FuncType>
+    void submit_task(FuncType&& func) {
         tasks_->push(
             [&] () {
-                func(std::forward<Args>(args)...);
+                func();
             });
     }
 
