@@ -5,13 +5,13 @@
 
 namespace il { namespace impl {
 
-template<typename T>
+template<typename T, typename ConditionVariableType>
 class shared_state_recv {
-    std::shared_ptr<shared_state<T>> state_ = { nullptr };
+    std::shared_ptr<shared_state<T,ConditionVariableType>> state_ = { nullptr };
 public:
-    shared_state_recv() { state_ = std::make_shared<shared_state<T>>(); }
-    shared_state_recv(const std::shared_ptr<shared_state<T>>& state) { state_ = state; }
-    shared_state_recv(std::shared_ptr<shared_state<T>>&& state) { state_ = std::move(state); }
+    shared_state_recv() { state_ = std::make_shared<shared_state<T, ConditionVariableType>>(); }
+    shared_state_recv(const std::shared_ptr<shared_state<T, ConditionVariableType>>& state) { state_ = state; }
+    shared_state_recv(std::shared_ptr<shared_state<T, ConditionVariableType>>&& state) { state_ = std::move(state); }
 
     shared_state_recv(const shared_state_recv& other) = delete;
     shared_state_recv(shared_state_recv&& other) = delete;
@@ -43,7 +43,7 @@ public:
         return state_->then(std::forward<Func>(func), launch_type);
     }
 
-    std::shared_ptr<shared_state<T>> state() {
+    std::shared_ptr<shared_state<T, ConditionVariableType>> state() {
         return state_;
     }
 };

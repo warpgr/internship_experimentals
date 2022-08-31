@@ -34,7 +34,7 @@ and no instruction can be reordered after a release operation;
     assert(!setted.load(std::memory_order_acquire)); //synchronizes with
 
 
-template <typename T, Mutex mutex_type = mutex>
+template <typename T, Mutex mutex_type = mutex, typename ConditionVariableType>
 class shared_state {
     unique_lock<mutex_type> wait_() {
         unique_lock<mutex_type> lock(guard_);
@@ -49,7 +49,7 @@ class shared_state {
         return lock;
     }
 protected:
-    condition_variable<unique_lock<mutex_type>>              is_ready_;
+    ConditionVariableType                                    is_ready_;
     mutex_type                                               guard_;
     T                                                        shared_data_; // TODO: must be with allocator // shared_ptr
     std::shared_ptr<std::exception>                          ex_ptr_ = nullptr;

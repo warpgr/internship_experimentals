@@ -26,7 +26,7 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/round_robin_scheduller.hpp
 
 
-             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/asio.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/asio/asio.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/asio/error_code.hpp
 
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/shared_state_impl/shared_state_interface.hpp 
@@ -36,10 +36,13 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/posix_context_impl.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/windows_context_impl.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/context_impl.hpp
+
+
+             ${CMAKE_CURRENT_SOURCE_DIR}/impl/synchronization_primitives/mutex_impl.hpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/impl/synchronization_primitives/condition_variable_impl.hpp
              )
 
-set (SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/mutex.cpp
-             ${CMAKE_CURRENT_SOURCE_DIR}/src/containers/list.cpp
+set (SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/containers/list.cpp
 
              ${CMAKE_CURRENT_SOURCE_DIR}/src/condition_variable.cpp
 

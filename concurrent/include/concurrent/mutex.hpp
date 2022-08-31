@@ -1,23 +1,11 @@
 #pragma once
 
-#include <atomic>
+#include <synchronization_primitives/mutex_impl.hpp>
 #include <concepts>
-
+#include <concurrent/handler.hpp>
 namespace il {
 
-class mutex {
-private:
-    std::atomic<bool> captured {false};
-public:
-    mutex() { }
-    mutex (mutex&& other) = delete;
-    mutex&& operator=(mutex&& other) = delete;
-    mutex(const mutex& other) = delete;
-    mutex& operator=(const mutex& other) = delete;
-    void lock();
-    void unlock();
-    bool try_lock();
-};
+using mutex = impl::mutex_impl<impl::ThreadBlockingHandler>;
 
 template <typename T>
 concept Lockable = requires(T m) {
