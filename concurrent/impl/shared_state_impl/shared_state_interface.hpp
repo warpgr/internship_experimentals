@@ -1,24 +1,14 @@
 #pragma once
-#include <concurrent/condition_variable.hpp>
-#include <concurrent/mutex.hpp>
-#include <concurrent/unique_lock.hpp>
 #include <exception>
 #include <chrono>
 #include <memory>
 #include <atomic>
-#include <iostream>
 #include <functional>
 #include <concurrent/thread_pool.hpp>
 
-namespace il { 
-template <typename T>
-class future;
-template <typename T>
-class promise;
-enum launch {
-    asynchronious = 1,
-    deferred = 2
-};
+namespace il {
+
+
 namespace impl {
 
 /*
@@ -34,7 +24,7 @@ and no instruction can be reordered after a release operation;
     assert(!setted.load(std::memory_order_acquire)); //synchronizes with
 
 
-template <typename T, Mutex mutex_type = mutex, typename ConditionVariableType>
+template <typename T, typename ConditionVariableType, Mutex mutex_type>
 class shared_state {
     unique_lock<mutex_type> wait_() {
         unique_lock<mutex_type> lock(guard_);
@@ -92,51 +82,29 @@ public: // Receiver interface
         unique_lock<mutex_type> lock(guard_);
         is_ready_.wait_until(lock, timeout_time);
     }
-    template <typename Func>
-    auto then(Func&& func, const launch& launch_type = launch::asynchronious) ->
-        future<decltype(func(T()))> {
-        auto prom = std::make_shared<il::promise<decltype(func(T()))>>();
-        std::function<void()> on_complete =
-            [&, promise_type = prom] () {
-                T value = get();
-                promise_type->set_value(func(std::forward<T>(value)));
-            };
-        switch (launch_type) {
-            case launch::deferred: {
-                on_complete_ = on_complete;
-                break;
-            }
-            case launch::asynchronious:
-            default: {
-                default_tp().put_task(std::move(on_complete));
-                break;
-            }
-        }
-        return prom->get_future();
-    }
 public: // Sender interface
     void set_value(T& value) {
         auto lock = wait_for_set();
         shared_data_ = value;
-        is_setted_.store(true, std::memory_order_release); //synchronizes with
+        is_setted_.store(true, std::memory_order_release); //synchronizes-with
         is_ready_.notify_one();
     }
     void set_value(T&& value) {
         auto lock = wait_for_set();
         shared_data_ = std::move(value);
-        is_setted_.store(true, std::memory_order_release); //synchronizes with
+        is_setted_.store(true, std::memory_order_release); //synchronizes-with
         is_ready_.notify_one();
     }
     void set_value(const T& value) {
         auto lock = wait_for_set();
         shared_data_(value);
-        is_setted_.store(true, std::memory_order_release); //synchronizes with
+        is_setted_.store(true, std::memory_order_release); //synchronizes-with
         is_ready_.notify_one();
     }
     void set_value() {
         auto lock = wait_for_set();
         shared_data_ = T();
-        is_setted_.store(true, std::memory_order_release); //synchronizes with
+        is_setted_.store(true, std::memory_order_release); //synchronizes-with
         is_ready_.notify_one();
     }
     void set_exception(const std::exception& ex) {
@@ -145,13 +113,16 @@ public: // Sender interface
     void set_exception(std::exception&& ex) {
         auto lock = wait_();
         ex_ptr_ = std::make_shared<std::exception>(std::move(ex));
-        is_setted_.store(true, std::memory_order_release); //synchronizes with
+        is_setted_.store(true, std::memory_order_release); //synchronizes-with
         is_ready_.notify_one();
     }
 
     void set_callback(std::function<void()> callback) {
         lazy_call_ = std::move(callback);
     }
+
+    void set_on_complete(std::function<void()> on_complete) {
+        on_complete_ = std::move(on_complete);
+    }
 };
 }}
-

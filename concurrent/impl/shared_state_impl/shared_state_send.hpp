@@ -4,13 +4,13 @@
 
 namespace il { namespace impl {
 
-template <typename T>
+template <typename T, typename ConditionVariabletype, Mutex mutex_type>
 class shared_state_send {
-    std::shared_ptr<shared_state<T, ConditionVariableType>> state_ = { nullptr };
+    std::shared_ptr<shared_state<T, ConditionVariabletype, mutex_type>> state_ = { nullptr };
 public:
-    shared_state_send() { state_ = std::make_shared<shared_state<T, ConditionVariableType>>(); }
-    shared_state_send(const std::shared_ptr<shared_state<T, ConditionVariableType>>& state) { state_ = state; }
-    shared_state_send(std::shared_ptr<shared_state<T, ConditionVariableType>>&& state) { state_ = std::move(state); }
+    shared_state_send() { state_ = std::make_shared<shared_state<T, ConditionVariabletype, mutex_type>>(); }
+    shared_state_send(const std::shared_ptr<shared_state<T, ConditionVariabletype, mutex_type>>& state) { state_ = state; }
+    shared_state_send(std::shared_ptr<shared_state<T, ConditionVariabletype, mutex_type>>&& state) { state_ = std::move(state); }
 
     shared_state_send(const shared_state_send& other) = delete;
     shared_state_send(shared_state_send&& other) = delete;
@@ -41,7 +41,7 @@ public:
         have_correct_state(state_);
         state_->set_exception(std::forward<T>(ex));
     }
-    std::shared_ptr<shared_state<T, ConditionVariableType>> state() {
+    std::shared_ptr<shared_state<T, ConditionVariabletype, mutex_type>> state() {
         return state_;
     }
     void set_callback(std::function<void()> callback) {

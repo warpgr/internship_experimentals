@@ -97,7 +97,7 @@ int main() {
     std::cout << "----------------Starting test_2()-----------------" <<std::endl;
     test_2();
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::cout << "-------------End o test_2()------------------------------" << std::endl;
+    std::cout << "-------------End of test_2()------------------------------" << std::endl;
 
 
     return 0;

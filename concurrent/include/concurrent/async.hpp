@@ -33,7 +33,7 @@ auto async( const launch& launch_type, Func func)
             break;
         }
     }
-    
+
     return prom->get_future();
 }
 

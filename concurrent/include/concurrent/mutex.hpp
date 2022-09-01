@@ -7,21 +7,6 @@ namespace il {
 
 using mutex = impl::mutex_impl<impl::ThreadBlockingHandler>;
 
-template <typename T>
-concept Lockable = requires(T m) {
-    { m.lock()     };
-    { m.unlock()   };
-    { m.try_lock() };
-};
-
-template <typename T>
-concept Mutex = 
-    Lockable<T>                   &&
-    std::default_initializable<T> &&
-    std::destructible<T>          &&
-    !std::movable<T>              &&
-    !std::copyable<T>;
-
 struct adopt_lock_t {};
 
 template <Mutex mutex_type>

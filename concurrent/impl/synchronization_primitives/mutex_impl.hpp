@@ -2,11 +2,27 @@
 #pragma once
 
 #include <atomic>
+#include <concepts>
 
 
+namespace il { 
 
-namespace il { namespace impl {
+template <typename T>
+concept Lockable = requires(T m) {
+    { m.lock()     };
+    { m.unlock()   };
+    { m.try_lock() };
+};
 
+template <typename T>
+concept Mutex = 
+    Lockable<T>                   &&
+    std::default_initializable<T> &&
+    std::destructible<T>          &&
+    !std::movable<T>              &&
+    !std::copyable<T>;
+
+namespace impl {
 
 
 template <typename BlockingHandlerType>

@@ -1,10 +1,12 @@
 #pragma once 
 #include <atomic>
+#include <synchronization_primitives/mutex_impl.hpp>
+
 
 namespace il { namespace impl {
 
 
-template <typename BlockinHandler , typename lock_type>
+template <typename BlockinHandler , Mutex lock_type>
 class condition_variable_impl {
     BlockinHandler    handler_;
     std::atomic<bool> flag_     = { false };

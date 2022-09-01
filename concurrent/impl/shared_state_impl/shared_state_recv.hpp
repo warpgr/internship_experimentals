@@ -3,15 +3,18 @@
 #include <shared_state_impl/shared_state_interface.hpp>
 #include <concepts>
 
+// #include <shared_state_impl/shared_state_send.hpp>
+
 namespace il { namespace impl {
 
-template<typename T, typename ConditionVariableType>
+
+template<typename T, typename ConditionVariableType, Mutex mutex_type>
 class shared_state_recv {
-    std::shared_ptr<shared_state<T,ConditionVariableType>> state_ = { nullptr };
+    std::shared_ptr<shared_state<T,ConditionVariableType, mutex_type>> state_ = { nullptr };
 public:
-    shared_state_recv() { state_ = std::make_shared<shared_state<T, ConditionVariableType>>(); }
-    shared_state_recv(const std::shared_ptr<shared_state<T, ConditionVariableType>>& state) { state_ = state; }
-    shared_state_recv(std::shared_ptr<shared_state<T, ConditionVariableType>>&& state) { state_ = std::move(state); }
+    shared_state_recv() { state_ = std::make_shared<shared_state<T, ConditionVariableType, mutex_type>>(); }
+    shared_state_recv(const std::shared_ptr<shared_state<T, ConditionVariableType, mutex_type>>& state) { state_ = state; }
+    shared_state_recv(std::shared_ptr<shared_state<T, ConditionVariableType, mutex_type>>&& state) { state_ = std::move(state); }
 
     shared_state_recv(const shared_state_recv& other) = delete;
     shared_state_recv(shared_state_recv&& other) = delete;
@@ -37,13 +40,11 @@ public:
         return state_->wait_until(timeout_time);
     }
 
-    template <typename Func>
-    auto then(Func&& func, const launch& launch_type = launch::asynchronious) ->
-        future<decltype(func(T()))> {
-        return state_->then(std::forward<Func>(func), launch_type);
+    void set_on_complete(std::function<void()> on_complete) {
+        state_->set_on_complete(on_complete);
     }
 
-    std::shared_ptr<shared_state<T, ConditionVariableType>> state() {
+    std::shared_ptr<shared_state<T, ConditionVariableType, mutex_type>> state() {
         return state_;
     }
 };
