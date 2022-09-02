@@ -9,7 +9,7 @@
 using namespace std::chrono_literals;
 
 
-il::condition_variable cv;
+il::condition_variable<il::unique_lock<il::mutex>> cv;
 il::mutex              m;
 int                    counter;
 bool                   ready = false;

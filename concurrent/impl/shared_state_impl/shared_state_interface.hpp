@@ -27,10 +27,8 @@ and no instruction can be reordered after a release operation;
 
 template <typename T, typename ConditionVariableType, Mutex mutex_type>
 class shared_state {
-    unique_lock<mutex_type> wait_() {
-        unique_lock<mutex_type> lock(guard_);
+    void wait_(unique_lock<mutex_type>& lock) {
         is_ready_.wait(lock, [&] { return is_setted_.load(std::memory_order_acquire); }); //synchronizes with
-        return lock;
     }
     unique_lock<mutex_type> wait_for_set() {
         unique_lock<mutex_type> lock(guard_);
@@ -59,7 +57,8 @@ public: // Receiver interface
     T get() {
         if (lazy_call_) { lazy_call_(); } // Works on defferd launch.
         if (on_complete_) { on_complete_(); } // Works with .then //
-        auto lock = wait_();
+        unique_lock<mutex_type> lock(guard_);
+        wait_(lock);
         if (nullptr != ex_ptr_) {
             throw ex_ptr_;
         }
@@ -69,7 +68,8 @@ public: // Receiver interface
         return tmp;
     }
     void wait() {
-       wait_();
+       unique_lock<mutex_type> lock(guard_);
+       wait_(lock);
     }
     template <typename Rep, typename Period = std::ratio<1>>
         requires std::is_arithmetic_v<Rep>
@@ -112,7 +112,8 @@ public: // Sender interface
        set_exception(std::exception(ex));
     }
     void set_exception(std::exception&& ex) {
-        auto lock = wait_();
+        unique_lock<mutex_type> lock(guard_);
+        wait_(lock);
         ex_ptr_ = std::make_shared<std::exception>(std::move(ex));
         is_setted_.store(true, std::memory_order_release); //synchronizes-with
         is_ready_.notify_one();

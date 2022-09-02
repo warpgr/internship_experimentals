@@ -48,7 +48,7 @@ void test_1() {
 void test_2() {
     il::promise<int> generator_promise;
     il::future<int> generator_future = generator_promise.get_future();
-    const int count = 100000;
+    const int count = 1000;
     std::vector<int> elements;
     std::thread sender_thread {
         [&generator_promise, &count] () {
@@ -80,10 +80,10 @@ void test_2() {
         }
     }
     assert(not_broken);
-    for (auto& element : elements) {
-        std::cout << element << " " << std::flush;
-    }
-    std::cout << "\n";
+    // for (auto& element : elements) {
+    //     std::cout << element << " " << std::flush;
+    // }
+    // std::cout << "\n";
 }
 
 
