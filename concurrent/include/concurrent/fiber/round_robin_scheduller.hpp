@@ -25,7 +25,7 @@ public:
         return next_fiber_for_this_thread;
     }
 
-    bool is_not_empty_queue() {
+    bool is_not_empty_queue() override {
         return !fiber_queue_.empty();
     }
 

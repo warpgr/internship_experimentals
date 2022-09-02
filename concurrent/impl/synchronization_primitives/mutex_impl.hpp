@@ -5,7 +5,7 @@
 #include <concepts>
 
 
-namespace il { 
+namespace il {
 
 template <typename T>
 concept Lockable = requires(T m) {
@@ -57,6 +57,5 @@ template <typename BlockingHandlerType>
 bool mutex_impl<BlockingHandlerType>::try_lock() {
     return !(captured_.exchange(true,std::memory_order_acq_rel)); //synchronizes with
 }
-
 
 }}

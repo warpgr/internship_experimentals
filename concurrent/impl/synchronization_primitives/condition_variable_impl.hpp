@@ -1,7 +1,7 @@
 #pragma once 
 #include <atomic>
 #include <synchronization_primitives/mutex_impl.hpp>
-
+#include <concurrent/utility_concepts.hpp>
 
 namespace il { namespace impl {
 
@@ -21,7 +21,7 @@ public:
     void wait(lock_type& lock) {
         lock.unlock();
         // A read-modify-write operation with this memory order is both an acquire operation and a release operation.
-        while (!flag_.exchange(false, std::memory_order_acq_rel));
+        while (!flag_.exchange(false, std::memory_order_acq_rel)) { handler_.handle(); };
         lock.lock();
     }
 
@@ -58,6 +58,7 @@ public:
             // A read-modify-write operation with this memory order is both an acquire operation and a release operation
             is_notified = flag_.exchange(false, std::memory_order_acq_rel);
             if (is_notified) { break; }
+            handler_.handle();
         }
         lock.lock();
         return is_notified;
@@ -74,6 +75,7 @@ public:
                 // A read-modify-write operation with this memory order is both an acquire operation and a release operation
                 is_notified = flag_.exchange(false, std::memory_order_acq_rel);
                 if (is_notified) { return true; }
+                handler_.handle();
             }
         }
         lock.lock();
@@ -89,11 +91,6 @@ public:
         // A store operation with this memory order performs the release operation: 
         // no reads or writes in the current thread can be reordered after this store.
         flag_.store(true, std::memory_order_release);
-    }
-private:
-    inline void lock_unlock(lock_type& lock) {
-        lock.lock();
-        lock.unlock();
     }
 };
 

@@ -2,60 +2,10 @@
 
 #include <vector>
 #include <thread>
-#include <atomic>
-#include <concepts>
-
-#include <concurrent/containers/mpmc_queue.hpp>
 
 namespace il {
 
-// template <typename T>
-// concept Executor = requires(T e) {
-//     { 
-//         std::invocable<std::function<void()>> f;
-//         e.submit_task(f) };
-//     { e.submit_empty_task() };
-//     { 
-//         std::invocable<std::function<void()>> f;
-//         e.execute() };
-//     { e.execute_all() };
-// };
-
-
-class function_executor {
-    std::shared_ptr<mpmc_queue<std::function<void()>>>     tasks_;
-public:
-    function_executor() {
-        tasks_ = std::make_shared<mpmc_queue<std::function<void()>>>();
-    }
-    template <std::invocable FuncType>
-    void submit_task(FuncType&& func) {
-        tasks_->push(
-            [&] () {
-                func();
-            });
-    }
-
-    void submit_empty_task() {
-        tasks_->push({});
-    }
-    template <typename FuncType, typename... Args>
-    void execute(FuncType&& func, Args... args) {
-        [&] () {
-            func(std::forward<Args>(args)...);
-        }();
-    }
-
-    void execute_all() {
-        while (true) {
-            auto task = tasks_->pop();
-            if (!task) { break; }
-            execute(task);
-        }
-    }
-};
-
-template <typename executor_type = function_executor>
+template <typename executor_type>
 class thread_pool {
     executor_type             executor_;
     std::vector<std::thread>  workers_;
@@ -91,9 +41,12 @@ private:
     }
 };
 
-template<typename executor_type = function_executor>
+class function_executor;
+
+template <typename executor_type = function_executor>
 thread_pool<executor_type>& default_tp() {
     static thread_pool<executor_type> tp;
     return tp;
 }
+
 } // namespace il

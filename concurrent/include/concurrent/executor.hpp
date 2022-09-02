@@ -1,18 +1,16 @@
-#pragma once
+#pragma once 
 
-#include <functional>
-#include <memory>
+
 #include <concurrent/containers/mpmc_queue.hpp>
-#include <concurrent/fiber/fiber.hpp>
 #include <concurrent/thread_pool.hpp>
+#include <memory>
 
+namespace il {
 
-namespace il { namespace fiber {
-
-class fiber_executor {
+class function_executor {
     std::shared_ptr<mpmc_queue<std::function<void()>>>     tasks_;
 public:
-    fiber_executor() {
+    function_executor() {
         tasks_ = std::make_shared<mpmc_queue<std::function<void()>>>();
     }
     template <typename FuncType, typename... Args>
@@ -28,11 +26,7 @@ public:
     }
     template <typename FuncType, typename... Args>
     void execute(FuncType&& func, Args... args) {
-        auto packed_function = [&] () {
-            func(std::forward<Args>(args)...);
-        };
-        auto current_fiber = fiber::create(packed_function, "fiber_from_executor");
-        fiber::yield_to(current_fiber);
+        func(std::forward<Args>(args)...);
     }
 
     void execute_all() {
@@ -41,17 +35,14 @@ public:
             if (!task) { break; }
             execute(task);
         }
-        while (fiber::get_scheduler()->is_not_empty_queue()) {
-            fiber::yield();
-        }
     }
 };
 
 
 
-thread_pool<fiber_executor>& default_fiber_executor() {
-    static thread_pool<fiber_executor> tp;
+thread_pool<function_executor>& default_thread_executor() {
+    static thread_pool<function_executor> tp;
     return tp;
 }
 
-}};
+}

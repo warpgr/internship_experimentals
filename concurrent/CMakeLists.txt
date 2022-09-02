@@ -14,7 +14,8 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/condition_variable.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/thread_pool.hpp 
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/utility_concepts.hpp
-             
+
+             ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/executor.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/future.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/async.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/packaged_task.hpp
@@ -36,6 +37,9 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/posix_context_impl.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/windows_context_impl.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/fiber/context_impl.hpp
+
+
+             ${CMAKE_CURRENT_SOURCE_DIR}/impl/future_impl/future_impl.hpp
 
 
              ${CMAKE_CURRENT_SOURCE_DIR}/impl/synchronization_primitives/mutex_impl.hpp

@@ -5,6 +5,8 @@
 #include <shared_state_impl/shared_state_recv.hpp>
 #include <shared_state_impl/shared_state_send.hpp>
 
+#include <concurrent/thread_pool.hpp>
+
 namespace il {
 
 enum launch {
@@ -15,16 +17,16 @@ enum launch {
 namespace impl {
 
 
-template <typename T, typename ConditionVariableType, Mutex mutex_type>
+template <typename T, typename ConditionVariableType, Mutex mutex_type, typename executor_type>
 class future_impl;
 
 
-template <typename T, typename ConditionVariableType, Mutex mutex_type>
-future_impl<T, ConditionVariableType, mutex_type> 
+template <typename T, typename ConditionVariableType, Mutex mutex_type, typename executor_type>
+future_impl<T, ConditionVariableType, mutex_type, executor_type> 
     create_future(std::shared_ptr<impl::shared_state<T, ConditionVariableType, mutex_type>> shared_state_ptr);
 
 
-template <typename T, typename ConditionVariableType, Mutex mutex_type>
+template <typename T, typename ConditionVariableType, Mutex mutex_type, typename executor_type>
 class promise_impl {
     std::shared_ptr<impl::shared_state_send<T, ConditionVariableType, mutex_type>> state_;
 public:
@@ -40,8 +42,8 @@ public:
     }
 
 public:
-    future_impl<T, ConditionVariableType, mutex_type> get_future() {
-        return create_future( state_->state() );
+    future_impl<T, ConditionVariableType, mutex_type, executor_type> get_future() {
+        return create_future<T, ConditionVariableType, mutex_type, executor_type>( state_->state() );
     }
     void set_value(T& value) {
         state_->set_value(std::forward<T>(value));
@@ -64,13 +66,13 @@ public:
     }
 };
 
-template <typename T, typename ConditionVariableType, Mutex mutex_type>
+template <typename T, typename ConditionVariableType, Mutex mutex_type, typename executor_type>
 class future_impl {
     std::shared_ptr<impl::shared_state_recv<T, ConditionVariableType, mutex_type>> state_;
 private:
     friend 
-        future_impl<T, ConditionVariableType, mutex_type> 
-            create_future<T, ConditionVariableType, mutex_type>(std::shared_ptr<impl::shared_state<T, ConditionVariableType, mutex_type>> shared_state_ptr);
+        future_impl<T, ConditionVariableType, mutex_type, executor_type> 
+            create_future<T, ConditionVariableType, mutex_type, executor_type>(std::shared_ptr<impl::shared_state<T, ConditionVariableType, mutex_type>> shared_state_ptr);
 private:
     future_impl(std::shared_ptr<impl::shared_state<T, ConditionVariableType, mutex_type>> shared_state_ptr) {
         state_ = std::make_shared<impl::shared_state_recv<T, ConditionVariableType, mutex_type>>( std::move( shared_state_ptr ) );
@@ -84,7 +86,7 @@ public:
         state_ = std::move(other.state_);
     }
     future_impl&& operator=(future_impl&& other) {
-        return future_impl<T, ConditionVariableType, mutex_type>(std::move(other.state_));
+        return future_impl<T, ConditionVariableType, mutex_type, executor_type>(std::move(other.state_));
     }
 public:
     void wait() {
@@ -108,8 +110,8 @@ public:
     }
     template <typename Func>
     auto then(Func&& func, const launch& launch_type = launch::asynchronious)
-        -> future_impl<decltype(func(T())), ConditionVariableType, mutex_type> {
-        auto prom = std::make_shared<promise_impl<decltype(func(T())), ConditionVariableType, mutex_type>>();
+        -> future_impl<decltype(func(T())), ConditionVariableType, mutex_type, executor_type> {
+        auto prom = std::make_shared<promise_impl<decltype(func(T())), ConditionVariableType, mutex_type, executor_type>>();
         std::function<void()> on_complete =
             [&, prom_type = prom] () {
                 T value = get();
@@ -122,7 +124,7 @@ public:
             }
             case launch::asynchronious:
             default: {
-                default_tp().put_task(std::move(on_complete));
+                default_tp<executor_type>().put_task(std::move(on_complete));
                 break;
             }
         }
@@ -131,10 +133,10 @@ public:
 };
 
 
-template <typename T, typename ConditionVariableType, Mutex mutex_type>
-future_impl<T, ConditionVariableType, mutex_type>
+template <typename T, typename ConditionVariableType, Mutex mutex_type, typename executor_type>
+future_impl<T, ConditionVariableType, mutex_type, executor_type>
 create_future(std::shared_ptr<impl::shared_state<T, ConditionVariableType, mutex_type>> shared_state_ptr) {
-    return future_impl<T, ConditionVariableType, mutex_type>(shared_state_ptr);
+    return future_impl<T, ConditionVariableType, mutex_type, executor_type>(shared_state_ptr);
 }
 
 }}

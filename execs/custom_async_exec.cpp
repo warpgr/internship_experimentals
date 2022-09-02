@@ -22,22 +22,25 @@ int main() {
         }
     );
     std::cout << "Main" << std::endl;
-    std::cout << await(val);
+    int b = await_(val);
+    std::cout << b << std::flush;
 
 
-    // auto res_fut = async_(
-    //     [] () -> int {
-    //         std::this_thread::sleep_for(std::chrono::seconds(2));
-    //         // std::cout << "setter thread after sleeping\n";
-    //         std::cout << std::this_thread::get_id() << std::endl;
-    //         return 1;
-    //     }
-    // )
-    // .then(foo)
-    // .then(foo)
-    // .then(foo)
-    // .then(foo)
-    // .then(foo);
+    int a = 4;
+
+    auto res_fut = async_(
+        [] () -> int {
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            // std::cout << "setter thread after sleeping\n";
+            std::cout << std::this_thread::get_id() << std::endl;
+            return 1;
+        }
+    )
+    .then(foo)
+    .then(foo)
+    .then(foo)
+    .then(foo)
+    .then(foo);
 
     // auto res_fut_2 = async_(
     //     [] () -> int {

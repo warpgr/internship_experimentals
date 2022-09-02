@@ -47,3 +47,11 @@ target_link_libraries ( simple_fiber_exec ${CMAKE_THREAD_LIBS_INIT} containers)
 
 add_executable ( fibers_with_thread_pool fibers_with_thread_pool.cpp )
 target_link_libraries ( fibers_with_thread_pool ${CMAKE_THREAD_LIBS_INIT} containers)
+
+
+add_executable ( custom_fiber_async_exec custom_fiber_async_exec.cpp )
+target_link_libraries ( custom_fiber_async_exec ${CMAKE_THREAD_LIBS_INIT} containers)
+
+
+add_executable ( fiber_future_exec fiber_future_exec.cpp )
+target_link_libraries ( fiber_future_exec ${CMAKE_THREAD_LIBS_INIT} containers)
