@@ -4,6 +4,6 @@
 namespace il { namespace impl {
 
 struct ThreadBlockingHandler {
-    void handle() {}
+    static void handle();
 };
 }}

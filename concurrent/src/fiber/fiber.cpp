@@ -55,6 +55,13 @@ std::shared_ptr<scheduler> fiber::get_scheduler() {
     return thread_local_d->scheduler_;
 }
 
+void fiber::wait_for_all() {
+    while (thread_local_d->scheduler_->is_not_empty_queue()) {
+        yield();
+    }
+}
+
+
 fiber_ptr fiber::create(const std::function<void()>& function, const std::string& name, bool is_main_fiber) {
     fiber_ptr new_fiber = std::make_shared<fiber>(function, name, is_main_fiber);
     new_fiber->impl_ = std::make_shared<impl::context_impl>(impl::fiber_and_routine(new_fiber, &fiber::fiber_routine), is_main_fiber);

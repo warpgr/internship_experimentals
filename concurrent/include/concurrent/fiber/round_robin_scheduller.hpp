@@ -21,6 +21,7 @@ public:
 
     virtual fiber_ptr next() override {
         fiber_ptr next_fiber_for_this_thread = take_next_fiber();
+        if ( !next_fiber_for_this_thread) { return nullptr; }
         set_new_schedulled_fiber_for_this_thread(next_fiber_for_this_thread, false);
         return next_fiber_for_this_thread;
     }

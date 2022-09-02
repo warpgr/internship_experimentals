@@ -3,6 +3,7 @@
 #include <functional>
 #include <fiber/context_impl.hpp>
 #include <concurrent/fiber/scheduller.hpp>
+#include <chrono>
 
 namespace il { namespace fiber {
 
@@ -13,6 +14,15 @@ public:
     static void yield_to(fiber_ptr f);
     static void yield();
     static std::shared_ptr<scheduler> get_scheduler();
+    static void wait_for_all();
+
+    template <typename Rep, typename Period = std::ratio<1>> 
+        requires std::is_arithmetic_v<Rep>
+    static void this_fiber_sleep_for(const std::chrono::duration<Rep, Period>& timeout_duration);
+
+    template <typename Clock, typename Duration = typename Clock::duration>
+        requires std::chrono::is_clock_v<Clock>
+    static void this_fiber_sleep_until(const std::chrono::time_point<Clock, Duration>& time_point);
 public:
     fiber(const std::function<void()>& func, const std::string& name, bool is_main_fiber);
 
@@ -65,5 +75,22 @@ private:
     std::shared_ptr<impl::context_impl>                    impl_;
     std::shared_ptr<thread_local_data>                     data_;
 };
+
+template <typename Rep, typename Period> 
+        requires std::is_arithmetic_v<Rep>
+void fiber::this_fiber_sleep_for(const std::chrono::duration<Rep, Period>& timeout_duration) {
+    auto now = std::chrono::system_clock::now();
+    now += timeout_duration;
+    return this_fiber_sleep_until(now);
+}
+
+
+template <typename Clock, typename Duration>
+    requires std::chrono::is_clock_v<Clock>
+void fiber::this_fiber_sleep_until(const std::chrono::time_point<Clock, Duration>& time_point) {
+    while (std::chrono::system_clock::now() < time_point) {
+        yield();
+    }
+}
 
 }}

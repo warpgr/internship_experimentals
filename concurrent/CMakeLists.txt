@@ -21,6 +21,8 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/packaged_task.hpp
 
 
+
+
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/fiber.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/executor.hpp
              ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/fiber/scheduller.hpp
@@ -49,11 +51,11 @@ set (HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/concurrent/containers/list.hpp
 set (SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/containers/list.cpp
 
              ${CMAKE_CURRENT_SOURCE_DIR}/src/condition_variable.cpp
-
+             ${CMAKE_CURRENT_SOURCE_DIR}/src/handler.cpp
 
 
              ${CMAKE_CURRENT_SOURCE_DIR}/src/fiber/fiber.cpp
-
+             ${CMAKE_CURRENT_SOURCE_DIR}/src/fiber/handler.cpp
 
 
              ${CMAKE_CURRENT_SOURCE_DIR}/src/impl/fiber/windows_context_impl.cpp

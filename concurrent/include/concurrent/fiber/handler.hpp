@@ -3,9 +3,7 @@
 
 namespace il { namespace fiber { namespace impl {
 struct FiberBlcokingHandler {
-    void handle() {
-        fiber::yield();
-    }
+    static void handle();
 };
 
 }}}

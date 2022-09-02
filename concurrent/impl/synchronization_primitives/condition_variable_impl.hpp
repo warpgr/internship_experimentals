@@ -8,7 +8,6 @@ namespace il { namespace impl {
 
 template <typename BlockinHandler , Mutex lock_type>
 class condition_variable_impl {
-    BlockinHandler    handler_;
     std::atomic<bool> flag_     = { false };
 public:
     condition_variable_impl() = default;
@@ -21,7 +20,7 @@ public:
     void wait(lock_type& lock) {
         lock.unlock();
         // A read-modify-write operation with this memory order is both an acquire operation and a release operation.
-        while (!flag_.exchange(false, std::memory_order_acq_rel)) { handler_.handle(); };
+        while (!flag_.exchange(false, std::memory_order_acq_rel)) { BlockinHandler::handle(); };
         lock.lock();
     }
 
@@ -58,7 +57,7 @@ public:
             // A read-modify-write operation with this memory order is both an acquire operation and a release operation
             is_notified = flag_.exchange(false, std::memory_order_acq_rel);
             if (is_notified) { break; }
-            handler_.handle();
+            BlockinHandler::handle();
         }
         lock.lock();
         return is_notified;
@@ -75,7 +74,7 @@ public:
                 // A read-modify-write operation with this memory order is both an acquire operation and a release operation
                 is_notified = flag_.exchange(false, std::memory_order_acq_rel);
                 if (is_notified) { return true; }
-                handler_.handle();
+                BlockinHandler::handle();
             }
         }
         lock.lock();
