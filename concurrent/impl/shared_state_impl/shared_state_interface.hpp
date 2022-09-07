@@ -85,10 +85,7 @@ public: // Receiver interface
     }
 public: // Sender interface
     void set_value(T& value) {
-        auto lock = wait_for_set();
-        shared_data_ = value;
-        is_setted_.store(true, std::memory_order_release); //synchronizes-with
-        is_ready_.notify_one();
+        set_value(std::move(value));
     }
     void set_value(T&& value) {
         auto lock = wait_for_set();
@@ -98,15 +95,10 @@ public: // Sender interface
     }
     void set_value(const T& value) {
         auto lock = wait_for_set();
-        shared_data_(value);
-        is_setted_.store(true, std::memory_order_release); //synchronizes-with
-        is_ready_.notify_one();
+        set_value(std::move(T(value)));
     }
     void set_value() {
-        auto lock = wait_for_set();
-        shared_data_ = T();
-        is_setted_.store(true, std::memory_order_release); //synchronizes-with
-        is_ready_.notify_one();
+        set_value(T());
     }
     void set_exception(const std::exception& ex) {
        set_exception(std::exception(ex));

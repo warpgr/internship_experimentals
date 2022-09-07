@@ -42,14 +42,14 @@ public:
 
 template <typename BlockingHandlerType>
 void mutex_impl<BlockingHandlerType>::lock() {
-    while (captured_.exchange(true,std::memory_order_acq_rel)) {
+    while (captured_.exchange(true, std::memory_order_acq_rel)) {
         BlockingHandlerType::handle();
     } //synchronizes with
 }
 
 template <typename BlockingHandlerType>
 void mutex_impl<BlockingHandlerType>::unlock() {
-    captured_ = false;
+    captured_.store(false, std::memory_order_release);
 }
 
 template <typename BlockingHandlerType>

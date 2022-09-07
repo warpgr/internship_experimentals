@@ -19,8 +19,11 @@ public:
 public:
     void wait(lock_type& lock) {
         lock.unlock();
-        // A read-modify-write operation with this memory order is both an acquire operation and a release operation.
-        while (!flag_.exchange(false, std::memory_order_acq_rel)) { BlockinHandler::handle(); };
+        {
+            // A read-modify-write operation with this memory order is both an acquire operation and a release operation.
+            while (!flag_.exchange(false, std::memory_order_acq_rel)) { BlockinHandler::handle(); };
+        }
+       
         lock.lock();
     }
 

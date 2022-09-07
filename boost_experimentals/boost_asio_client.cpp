@@ -26,7 +26,14 @@ public:
     }
 private:
     void on_connect(boost::system::error_code ec) {
-        if ( ec) { return; }
+        if ( ec ) {
+            close_connection();
+            return;
+        }
+        do_write();
+    }
+
+    void do_write() {
         auto self = shared_from_this();
         socket_.async_write_some(boost::asio::buffer("Hello"),
             [self] (boost::system::error_code ec, size_t bytes_transfered) {
@@ -35,15 +42,22 @@ private:
     }
 
     void on_write(boost::system::error_code ec, size_t bytes_transfered) {
-        if ( ec ) { return; }
+        if ( ec ) {
+            close_connection();
+            return;
+        }
         auto self = shared_from_this();
         socket_.async_read_some(boost::asio::buffer(buf_),
             [self] (boost::system::error_code ec, size_t bytes_transfered) {
                 std::string str;
                 std::copy(self->buf_.begin(), self->buf_.end(), std::back_insert_iterator(str));
                 std::cout << str << std::endl;
-                self->socket_.close();
+                self->do_write();
             });
+    }
+
+    void close_connection() {
+        socket_.close();
     }
 };
 

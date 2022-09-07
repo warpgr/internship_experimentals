@@ -36,7 +36,10 @@ private:
     }
 
     void on_read(boost::system::error_code& ec, size_t bytes_transfered) {
-        if (ec) { return; }
+        if (ec) {
+            close_connection();
+            return;
+        }
         if ( !bytes_transfered ) { do_read(); }
         auto self = shared_from_this();
         std::cout << "sesion::start()starting writing" << std::endl; 
@@ -50,7 +53,10 @@ private:
     }
 
     void on_write(boost::system::error_code& ec, size_t bytes_transfered) {
-        if (ec) { return; }
+       if (ec) {
+            close_connection();
+            return;
+        }
         do_read();
     }
 
@@ -67,7 +73,7 @@ public:
 
     server(boost::asio::io_context& context, boost::asio::ip::tcp::endpoint& ep)
         : io_context_(context)
-        , acceptor_(io_context_, ep ) {
+        , acceptor_( io_context_, ep ) {
             do_accept();
         }
 

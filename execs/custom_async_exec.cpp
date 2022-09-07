@@ -13,7 +13,7 @@ int main() {
     std::cout << "Main tid " << std::this_thread::get_id() << std::endl;
     // std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    auto val =  async_(
+    auto val =  lazy_(
         [] () -> int {
             std::this_thread::sleep_for(std::chrono::seconds(2));
             // std::cout << "setter thread after sleeping\n";

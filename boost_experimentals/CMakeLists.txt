@@ -24,6 +24,7 @@ target_link_libraries (boost_asio_server ${Boost_LIBRARIES})
 add_executable ( boost_asio_client ${CMAKE_CURRENT_SOURCE_DIR}/boost_asio_client.cpp )
 target_link_libraries (boost_asio_client ${Boost_LIBRARIES})
 
+add_subdirectory(p2p)
 
 # add_executable ( boost_asio_with_fibers_server ${CMAKE_CURRENT_SOURCE_DIR}/boost_asio_with_fibers_server.cpp )
 # target_link_libraries (boost_asio_with_fibers_server ${Boost_LIBRARIES})
